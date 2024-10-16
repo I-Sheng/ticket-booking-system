@@ -5,7 +5,10 @@
 2. 驗證碼 (驗證不是機器人)
 3. 購票系統 (分散式)
 4. 主辦方新增活動
+
 ### 架構圖
+<img src="../assets/Architecture.png" width=400px>
+
 ## 技術
 * AWS EC2
 * 前端: typescript + REACT.js + tailwind css
@@ -15,3 +18,7 @@
 * [Trello link](https://trello.com/invite/b/67089cf18ad9778189ea02f6/ATTI82b780451d6a5205c6588824fb37d14d43D1A202/ticket-booking-system)
 * GitHub issue 同步 Trello cards
 * 討論時間: 週五 12:00 ~ 13:00
+
+<img src="../assets/Frame_1.png" width=400px>
+<img src="../assets/Frame_3.png" width=400px>
+<img src="../assets/Frame_4.png" width=400px>
