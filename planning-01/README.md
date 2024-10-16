@@ -19,6 +19,6 @@
 * GitHub issue 同步 Trello cards
 * 討論時間: 週五 12:00 ~ 13:00
 
-<img src="../assets/Frame_1.png" width=400px>
+<img src="../assets/homePage.png" width=400px>
 <img src="../assets/Frame_3.png" width=400px>
 <img src="../assets/Frame_4.png" width=400px>
