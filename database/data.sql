@@ -1,40 +1,64 @@
--- users 表
-INSERT INTO "users" ("email", "username", "role", "phone_number", "is_disabled", "created_at") VALUES
-('user1@example.com', 'JohnDoe', 'admin', '1234567890', FALSE, '2024-12-01 10:00:00'),
-('user2@example.com', 'JaneSmith', 'user', '0987654321', FALSE, '2024-12-02 11:00:00'),
-('user3@example.com', 'AliceWonder', 'user', '1122334455', TRUE, '2024-12-03 12:00:00'),
-('user4@example.com', 'BobBuilder', 'user', '2233445566', FALSE, '2024-12-04 13:00:00'),
-('user5@example.com', 'CharlieBrown', 'user', '5566778899', FALSE, '2024-12-05 14:00:00');
+-- Generate test data for `users`
+INSERT INTO "users" ("email", "username", "password", "role", "phone_number", "is_disabled")
+VALUES
+('user1@example.com', 'Alice', 'password1', 'admin', '1234567890', false),
+('user2@example.com', 'Bob', 'password2', 'user', '0987654321', false),
+('user3@example.com', 'Charlie', 'password3', 'user', '1122334455', true),
+('user4@example.com', 'Daisy', 'password4', 'admin', '2233445566', false),
+('user5@example.com', 'Eve', 'password5', 'user', '5566778899', false);
 
--- password 表
-INSERT INTO "password" ("email", "password") VALUES
-('user1@example.com', 'hashed_password1'),
-('user2@example.com', 'hashed_password2'),
-('user3@example.com', 'hashed_password3'),
-('user4@example.com', 'hashed_password4'),
-('user5@example.com', 'hashed_password5');
+-- Generate test data for `arenas`
+INSERT INTO "arenas" ("title", "address", "capacity")
+VALUES
+('Downtown Arena', '123 Main St, Cityville', 5000),
+('Uptown Arena', '456 Elm St, Townsville', 3000),
+('Eastside Arena', '789 Maple Ave, Eastville', 4000),
+('Westside Arena', '101 Oak St, Westville', 2000),
+('Northside Arena', '202 Pine St, Northville', 3500);
 
--- arena 表
-INSERT INTO "arena" ("id", "title", "address", "capacity") VALUES
-(1, 'Downtown Arena', '123 Main St, Cityville', 5000),
-(2, 'Uptown Arena', '456 Elm St, Townsville', 3000),
-(3, 'Eastside Arena', '789 Maple Ave, Eastville', 4000),
-(4, 'Westside Arena', '101 Oak St, Westville', 2000),
-(5, 'Northside Arena', '202 Pine St, Northville', 3500);
+-- Generate test data for `activities`
+INSERT INTO "activities" ("on_sale_date", "start_time", "end_time", "title", "content", "cover_img", "price_level_img", "arena_id")
+VALUES
+('2024-12-01', '2024-12-15 19:00:00', '2024-12-15 21:00:00', 'Concert A', 'A wonderful evening of music.', 'cover_a.jpg', 'price_a.jpg', (SELECT _id FROM "arenas" LIMIT 1 OFFSET 0)),
+('2024-12-05', '2024-12-20 18:00:00', '2024-12-20 20:00:00', 'Basketball Game B', 'Exciting match!', 'cover_b.jpg', 'price_b.jpg', (SELECT _id FROM "arenas" LIMIT 1 OFFSET 1)),
+('2024-12-10', '2024-12-25 20:00:00', '2024-12-25 22:00:00', 'Drama C', 'A captivating performance.', 'cover_c.jpg', 'price_c.jpg', (SELECT _id FROM "arenas" LIMIT 1 OFFSET 2)),
+('2024-12-15', '2024-12-30 19:30:00', '2024-12-30 21:30:00', 'Rock Concert D', 'An electrifying show.', 'cover_d.jpg', 'price_d.jpg', (SELECT _id FROM "arenas" LIMIT 1 OFFSET 3)),
+('2024-12-20', '2024-12-31 18:00:00', '2024-12-31 20:00:00', 'Comedy Show E', 'An evening of laughter.', 'cover_e.jpg', 'price_e.jpg', (SELECT _id FROM "arenas" LIMIT 1 OFFSET 4));
 
--- activity 表
-INSERT INTO "activity" ("id", "on_sale_date", "start_time", "end_time", "title", "content", "cover_img", "price_level_img", "arena_id", "region_name", "region_price") VALUES
-(1, '2024-11-25', ARRAY['2024-12-15 18:00:00'], ARRAY['2024-12-15 21:00:00'], 'Concert A', 'A wonderful evening of music.', 'cover1.jpg', 'price1.jpg', 1, ARRAY['VIP', 'General'], ARRAY[200, 50]),
-(2, '2024-11-28', ARRAY['2024-12-20 19:00:00'], ARRAY['2024-12-20 22:30:00'], 'Basketball Game B', 'Exciting match!', 'cover2.jpg', 'price2.jpg', 2, ARRAY['Court-side', 'Regular'], ARRAY[500, 100]),
-(3, '2024-11-30', ARRAY['2024-12-22 17:00:00'], ARRAY['2024-12-22 20:00:00'], 'Comedy Show C', 'An evening full of laughter.', 'cover3.jpg', 'price3.jpg', 3, ARRAY['Front-row', 'Middle', 'Back'], ARRAY[150, 100, 50]),
-(4, '2024-12-01', ARRAY['2024-12-25 18:00:00'], ARRAY['2024-12-25 21:30:00'], 'Drama D', 'A captivating drama performance.', 'cover4.jpg', 'price4.jpg', 4, ARRAY['Balcony', 'Floor'], ARRAY[300, 120]),
-(5, '2024-12-03', ARRAY['2024-12-28 20:00:00'], ARRAY['2024-12-28 23:00:00'], 'Rock Concert E', 'An electrifying rock concert.', 'cover5.jpg', 'price5.jpg', 5, ARRAY['Pit', 'Seating'], ARRAY[400, 80]);
+-- Generate test data for `regions`
+INSERT INTO "regions" ("activity_id", "region_name", "region_price", "region_capacity")
+VALUES
+((SELECT _id FROM "activities" LIMIT 1 OFFSET 0), 'VIP', 300, 100),
+((SELECT _id FROM "activities" LIMIT 1 OFFSET 1), 'General', 100, 200),
+((SELECT _id FROM "activities" LIMIT 1 OFFSET 2), 'Balcony', 150, 50),
+((SELECT _id FROM "activities" LIMIT 1 OFFSET 3), 'Floor', 200, 300),
+((SELECT _id FROM "activities" LIMIT 1 OFFSET 4), 'Pit', 500, 20);
 
--- ticket 表
-INSERT INTO "ticket" ("id", "created_at", "owner_email", "activity_id", "region", "seat_number", "is_paid") VALUES
-(1, '2024-12-01 14:00:00', 'user1@example.com', 1, 'VIP', 1, TRUE),
-(2, '2024-12-01 15:00:00', 'user2@example.com', 1, 'General', 100, FALSE),
-(3, '2024-12-02 10:00:00', 'user3@example.com', 2, 'Court-side', 5, TRUE),
-(4, '2024-12-03 11:00:00', 'user4@example.com', 3, 'Middle', 20, FALSE),
-(5, '2024-12-04 12:00:00', 'user5@example.com', 4, 'Floor', 10, TRUE);
+-- Generate test data for `tickets`
+INSERT INTO "tickets" ("user_id", "activity_id", "region_id", "seat_number", "is_paid")
+VALUES
+-- User 1 的票
+((SELECT _id FROM "users" LIMIT 1 OFFSET 0), (SELECT _id FROM "activities" LIMIT 1 OFFSET 0), (SELECT _id FROM "regions" LIMIT 1 OFFSET 0), 1, true),
+((SELECT _id FROM "users" LIMIT 1 OFFSET 0), (SELECT _id FROM "activities" LIMIT 1 OFFSET 1), (SELECT _id FROM "regions" LIMIT 1 OFFSET 1), 2, false),
+((SELECT _id FROM "users" LIMIT 1 OFFSET 0), (SELECT _id FROM "activities" LIMIT 1 OFFSET 2), (SELECT _id FROM "regions" LIMIT 1 OFFSET 2), 3, true),
+
+-- User 2 的票
+((SELECT _id FROM "users" LIMIT 1 OFFSET 1), (SELECT _id FROM "activities" LIMIT 1 OFFSET 1), (SELECT _id FROM "regions" LIMIT 1 OFFSET 1), 4, true),
+((SELECT _id FROM "users" LIMIT 1 OFFSET 1), (SELECT _id FROM "activities" LIMIT 1 OFFSET 2), (SELECT _id FROM "regions" LIMIT 1 OFFSET 2), 5, false),
+((SELECT _id FROM "users" LIMIT 1 OFFSET 1), (SELECT _id FROM "activities" LIMIT 1 OFFSET 3), (SELECT _id FROM "regions" LIMIT 1 OFFSET 3), 6, true),
+
+-- User 3 的票
+((SELECT _id FROM "users" LIMIT 1 OFFSET 2), (SELECT _id FROM "activities" LIMIT 1 OFFSET 2), (SELECT _id FROM "regions" LIMIT 1 OFFSET 2), 7, false),
+((SELECT _id FROM "users" LIMIT 1 OFFSET 2), (SELECT _id FROM "activities" LIMIT 1 OFFSET 3), (SELECT _id FROM "regions" LIMIT 1 OFFSET 3), 8, true),
+((SELECT _id FROM "users" LIMIT 1 OFFSET 2), (SELECT _id FROM "activities" LIMIT 1 OFFSET 4), (SELECT _id FROM "regions" LIMIT 1 OFFSET 4), 9, true),
+
+-- User 4 的票
+((SELECT _id FROM "users" LIMIT 1 OFFSET 3), (SELECT _id FROM "activities" LIMIT 1 OFFSET 3), (SELECT _id FROM "regions" LIMIT 1 OFFSET 3), 10, true),
+((SELECT _id FROM "users" LIMIT 1 OFFSET 3), (SELECT _id FROM "activities" LIMIT 1 OFFSET 4), (SELECT _id FROM "regions" LIMIT 1 OFFSET 4), 11, false),
+((SELECT _id FROM "users" LIMIT 1 OFFSET 3), (SELECT _id FROM "activities" LIMIT 1 OFFSET 0), (SELECT _id FROM "regions" LIMIT 1 OFFSET 0), 12, true),
+
+-- User 5 的票
+((SELECT _id FROM "users" LIMIT 1 OFFSET 4), (SELECT _id FROM "activities" LIMIT 1 OFFSET 4), (SELECT _id FROM "regions" LIMIT 1 OFFSET 4), 13, true),
+((SELECT _id FROM "users" LIMIT 1 OFFSET 4), (SELECT _id FROM "activities" LIMIT 1 OFFSET 0), (SELECT _id FROM "regions" LIMIT 1 OFFSET 0), 14, true),
+((SELECT _id FROM "users" LIMIT 1 OFFSET 4), (SELECT _id FROM "activities" LIMIT 1 OFFSET 1), (SELECT _id FROM "regions" LIMIT 1 OFFSET 1), 15, false);
 
