@@ -12,5 +12,8 @@ coverage
 # Benchmarking
 benchmarks/graphs
 
+.DS_Store
+dist
+.env
 # ignore additional files using core.excludesFile
 # https://git-scm.com/docs/gitignore
