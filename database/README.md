@@ -27,7 +27,11 @@
 6. 網頁重新整理。左欄Servers/{step 3.2設定的name}/Databases/ticket_db/Schemas/public/Tables會出現所有create的table  
    ![alt text](readme-assests/img-4.png)
 
-
+7. 寫 `../backend/.env` 檔，讓後端程式可以連過來。記得參考`../backend/.env.template`進行更新。寫的內容類似這樣：
+   ```.env
+   JWT_SECRET='your jwt secret'
+   DATABASE_URL='postgres://postgres:password@localhost:5432/ticket_db'
+   ```
 
 7. 若想要重置database
 
