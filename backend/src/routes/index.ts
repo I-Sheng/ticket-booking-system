@@ -1,2 +1,4 @@
-export { default as arenaRouter } from './arena'
-export { default as ticketRouter } from './ticket'
+export { default as arenaRouter } from './arenas'
+export { default as ticketRouter } from './tickets'
+export { default as activitiesRouter } from './activities'
+export { default as regionsRouter } from './regions'

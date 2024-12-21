@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import { arenaRouter,ticketRouter } from './routes'
+import { arenaRouter,ticketRouter,activitiesRouter,regionsRouter } from './routes'
 
 const app = express()
 app.use(cors())
@@ -13,8 +13,10 @@ app.get('/', (_req, res) => {
   res.send('Hello TypeScript with Express!')
 })
 
-app.use('/arena', arenaRouter)
-app.use('/ticket', ticketRouter)
+app.use('/arenas', arenaRouter)
+app.use('/tickets', ticketRouter)
+app.use('/regions', regionsRouter)
+app.use('/activities', activitiesRouter)
 
 app.listen(8080, () => {
   console.log(`Server is running on port ${port}`)
