@@ -1,8 +1,8 @@
 import express from 'express';
-import { listTickets, listTicketsByActivity } from '../../database/ticket/get';
-import { deleteTicket } from '../../database/ticket/delete';
-import { createTicket} from '../../database/ticket/post';
-import { updateTicket } from '../../database/ticket/update';
+import { listTickets, listTicketsByActivity } from '../../database/tickets/get';
+import { deleteTicket } from '../../database/tickets/delete';
+import { createTicket} from '../../database/tickets/post';
+import { updateTicket } from '../../database/tickets/update';
 
 const router = express.Router();
 
