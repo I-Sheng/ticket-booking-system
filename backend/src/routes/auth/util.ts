@@ -13,6 +13,6 @@ export function encryptPassword(plainText: string) {
   return bcrypt.hashSync(plainText, 10)
 }
 
-export function generateJWT(mail: string, role: string) {
-  return 'Bearer ' + jwt.sign({ mail, role }, env.JWT_SECRET)
+export function generateJWT(email: string, role: string) {
+  return 'Bearer ' + jwt.sign({ email, role }, env.JWT_SECRET)
 }
