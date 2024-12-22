@@ -4,7 +4,7 @@ import { env } from '../constants'
 import { ErrorRequestHandler } from 'express'
 
 export type DecodedType = {
-  mail: string
+  email: string
   role: string
   iat: number
 }
