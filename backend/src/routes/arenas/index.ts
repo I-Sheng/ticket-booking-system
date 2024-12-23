@@ -3,11 +3,12 @@ import { listArenas, getArenaById } from '../../database/arenas/get';
 import { createArena } from '../../database/arenas/post';
 import { updateArena } from '../../database/arenas/update';
 import { deleteArena } from '../../database/arenas/delete';
+import { jwtProtect,hostProtect } from '../middleware'
 
 const router = express.Router();
 
 // Create a new arena
-router.post('/create', async (req, res) => {
+router.post('/create',jwtProtect, hostProtect, async (req, res) => {
   try {
     const result = await createArena(req.body);
 
@@ -50,7 +51,7 @@ router.get('/arena/:arena_id', async (req, res) => {
 });
 
 // Update an arena
-router.patch('/update', async (req, res) => {
+router.patch('/update',jwtProtect, hostProtect, async (req, res) => {
   try {
     const result = await updateArena(req.body);
 
@@ -65,7 +66,7 @@ router.patch('/update', async (req, res) => {
 });
 
 // Delete an arena
-router.delete('/delete', async (req, res) => {
+router.delete('/delete',jwtProtect, hostProtect, async (req, res) => {
   try {
     const { arena_id } = req.body;
     const result = await deleteArena(arena_id);
