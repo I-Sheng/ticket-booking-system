@@ -1,21 +1,20 @@
+# npm
+node_modules
+package-lock.json
+npm-shrinkwrap.json
+*.log
+*.gz
+
+# Coveralls
+.nyc_output
+coverage
+
+# Benchmarking
+benchmarks/graphs
+
 .DS_Store
-
-# Images
-images/avatars/
-images/captchas/
-images/smileys/
-images/member_photos/
-images/signature_attachments/
-images/pm_attachments/
-
-# For security do not publish the following files
-system/expressionengine/config/database.php
-system/expressionengine/config/config.php
-
-# Caches
-sized/
-thumbs/
-_thumbs/
-*/expressionengine/cache/*
-
+dist
 .env
+# ignore additional files using core.excludesFile
+# https://git-scm.com/docs/gitignore
+
