@@ -3,11 +3,12 @@ import { listRegions } from '../../database/regions/get';
 import { createRegion } from '../../database/regions/post';
 import { updateRegion } from '../../database/regions/update';
 import { deleteRegion } from '../../database/regions/delete';
+import { jwtProtect,hostProtect } from '../middleware'
 
 const router = express.Router();
 
 // Create a new region
-router.post('/create', async (req, res) => {
+router.post('/create', jwtProtect,  hostProtect, async (req, res) => {
   try {
     const result = await createRegion(req.body);
 
@@ -43,7 +44,7 @@ router.get('/list', async (req, res) => {
 });
 
 // Update a region
-router.patch('/update', async (req, res) => {
+router.patch('/update',jwtProtect, hostProtect, async (req, res) => {
   try {
     const result = await updateRegion(req.body);
 
@@ -58,7 +59,7 @@ router.patch('/update', async (req, res) => {
 });
 
 // Delete a region
-router.delete('/delete', async (req, res) => {
+router.delete('/delete',jwtProtect, hostProtect, async (req, res) => {
   try {
     const { region_id } = req.body;
 

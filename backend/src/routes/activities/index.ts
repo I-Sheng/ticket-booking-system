@@ -3,11 +3,12 @@ import { listActivities, getActivityById} from '../../database/activities/get';
 import { createActivity } from '../../database/activities/post';
 import { updateActivity } from '../../database/activities/update';
 import { deleteActivity } from '../../database/activities/delete';
+import { jwtProtect,hostProtect } from '../middleware'
 
 const router = express.Router();
 
 // Create a new activity
-router.post('/create', async (req, res) => {
+router.post('/create',jwtProtect, hostProtect, async (req, res) => {
   try {
     const result = await createActivity(req.body);
 
@@ -54,7 +55,7 @@ router.get('/get/:activity_id', async (req, res) => {
 });
 
 // Update an activity
-router.patch('/update', async (req, res) => {
+router.patch('/update',jwtProtect, hostProtect, async (req, res) => {
   try {
     const result = await updateActivity(req.body);
 
@@ -69,7 +70,7 @@ router.patch('/update', async (req, res) => {
 });
 
 // Delete an activity
-router.delete('/delete', async (req, res) => {
+router.delete('/delete',jwtProtect, hostProtect, async (req, res) => {
   try {
     const { activity_id } = req.body;
 
