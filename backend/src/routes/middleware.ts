@@ -30,7 +30,7 @@ export function jwtProtect(
       return next()
     }
     if (err.name === 'TokenExpiredError') {
-      return res.send(401).send('Token expired')
+      return res.status(401).send('Token expired')
     }
     if (err) {
       return res.status(403).send('Invalid token')
