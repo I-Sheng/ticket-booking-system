@@ -33,12 +33,6 @@
 <details>
 <summary><code>GET</code> <code><b>/list</b></code> <code>(List all regions for a specific activity)</code></summary>
 
-##### Headers
-
-> | key           | value          | description   |
-> | ------------- | -------------- | ------------- |
-> | Authorization | `Bearer token` | The JWT token |
-
 ##### Query Parameters
 
 > | key          | required | data type | description                     |
