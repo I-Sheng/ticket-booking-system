@@ -60,26 +60,12 @@ router.post('/login', async (req, res) => {
   // Generate JWT token
   const jwtToken = generateJWT(user.email, user.role)
 
-  return res.status(200).json({ email: user.email, role: user.role, jwtToken })
-})
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body
-
-  // Check if user exists
-  const user = await getUser(email)
-  if (user.error || !user) {
-    return res.status(404).send('User not found')
-  }
-
-  // Check if password matches
-  if (!comparePassword(password, user.password)) {
-    return res.status(401).send('Invalid credentials')
-  }
-
-  // Generate JWT token
-  const jwtToken = generateJWT(user.email, user.role)
-
-  return res.status(200).json({ email: user.email, role: user.role, jwtToken })
+  return res.status(200).json({
+    email: user.email,
+    username: user.username,
+    role: user.role,
+    jwtToken,
+  })
 })
 
 router.get('/userinfo', jwtProtect, async (req, res) => {
