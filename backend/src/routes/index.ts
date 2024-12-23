@@ -1,5 +1,5 @@
 export { default as arenaRouter } from './arenas'
-export { default as ticketRouter } from './tickets'
+export { default as ticketRouter } from './ticket_crud'
 export { default as activitiesRouter } from './activities'
 export { default as regionsRouter } from './regions'
 export { default as authRouter } from './auth'
