@@ -32,12 +32,6 @@
 <details>
 <summary><code>GET</code> <code><b>/list</b></code> <code>(List all arenas)</code></summary>
 
-##### Headers
-
-> | key           | value          | description   |
-> | ------------- | -------------- | ------------- |
-> | Authorization | `Bearer token` | The JWT token |
-
 ##### Query Parameters
 
 > | key       | required | data type | description              |
@@ -58,11 +52,6 @@
 <details>
 <summary><code>GET</code> <code><b>/arena/:arena_id</b></code> <code>(Get arena information by arena_id)</code></summary>
 
-##### Headers
-
-> | key           | value          | description   |
-> | ------------- | -------------- | ------------- |
-> | Authorization | `Bearer token` | The JWT token |
 
 ##### Path Parameters
 

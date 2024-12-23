@@ -37,12 +37,6 @@
 <details>
 <summary><code>GET</code> <code><b>/list</b></code> <code>(List all activities)</code></summary>
 
-##### Headers
-
-> | key           | value          | description   |
-> | ------------- | -------------- | ------------- |
-> | Authorization | `Bearer token` | The JWT token |
-
 ##### Query Parameters
 
 > | key      | required | data type | description                         |
@@ -63,12 +57,6 @@
 
 <details>
 <summary><code>GET</code> <code><b>/get/:activity_id</b></code> <code>(Get an activity by its ID)</code></summary>
-
-##### Headers
-
-> | key           | value          | description   |
-> | ------------- | -------------- | ------------- |
-> | Authorization | `Bearer token` | The JWT token |
 
 ##### Path Parameters
 
