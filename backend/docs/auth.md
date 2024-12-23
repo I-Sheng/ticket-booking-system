@@ -1,7 +1,5 @@
 # /auth routes
 
-
-
 ### **Register**
 
 <details>
@@ -9,21 +7,21 @@
 
 ##### Body (application/json or application/x-www-form-urlencoded)
 
-| key          | required | data type | description                  |
-| ------------ | -------- | --------- | ---------------------------- |
-| `email`      | true     | string    | User's email                 |
-| `password`   | true     | string    | User's password              |
-| `phone_number` | true   | string    | User's phone number          |
-| `role`       | true     | string    | "user" or "host"  |
-| `username`   | true     | string    | User's name                  |
+| key            | required | data type | description         |
+| -------------- | -------- | --------- | ------------------- |
+| `email`        | true     | string    | User's email        |
+| `password`     | true     | string    | User's password     |
+| `phone_number` | true     | string    | User's phone number |
+| `role`         | true     | string    | "user" or "host"    |
+| `username`     | true     | string    | User's name         |
 
 ##### Responses
 
-| http code    | content-type       | response                                    |
-| ------------ | ------------------ | ------------------------------------------- |
-| `201`        | `application/json` | `{"email": "user's email", "id": "user_id"}` |
-| `409`        | `text/plain`       | `User already exists`                       |
-| `500`        | `text/plain`       | `Internal server error`                     |
+| http code | content-type       | response                                     |
+| --------- | ------------------ | -------------------------------------------- |
+| `201`     | `application/json` | `{"email": "user's email", "id": "user_id"}` |
+| `409`     | `text/plain`       | `User already exists`                        |
+| `500`     | `text/plain`       | `Internal server error`                      |
 
 </details>
 
@@ -43,12 +41,12 @@
 
 ##### Responses
 
-| http code | content-type       | response                                                                                   |
-| --------- | ------------------ | ------------------------------------------------------------------------------------------ |
-| `200`     | `application/json` | `{"email": "user's email", "role": "user" \| "admin" \| "coach", jwtToken: "Bearer token"}` |
-| `401`     | `text/plain`       | `Invalid credentials`                                                                      |
-| `404`     | `text/plain`       | `User not found`                                                                           |
-| `500`     | `text/plain`       | `Internal server error`                                                                    |
+| http code | content-type       | response                                                                                                   |
+| --------- | ------------------ | ---------------------------------------------------------------------------------------------------------- |
+| `200`     | `application/json` | `{"email": "user's email", "username": "user's name", "role": "user" \| "host", jwtToken: "Bearer token"}` |
+| `401`     | `text/plain`       | `Invalid credentials`                                                                                      |
+| `404`     | `text/plain`       | `User not found`                                                                                           |
+| `500`     | `text/plain`       | `Internal server error`                                                                                    |
 
 </details>
 
@@ -61,18 +59,18 @@
 
 ##### Headers
 
-| key            | required | data type | description         |
-| -------------- | -------- | --------- | ------------------- |
+| key             | required | data type | description             |
+| --------------- | -------- | --------- | ----------------------- |
 | `Authorization` | true     | string    | Bearer token from login |
 
 ##### Responses
 
-| http code | content-type       | response                                                                                                   |
-| --------- | ------------------ | ---------------------------------------------------------------------------------------------------------- |
-| `200`     | `application/json` | `{"email": "user's email", "username": "user's name", "role": "user" \| "admin" \| "coach", "phone_number": "user's phone"}` |
-| `401`     | `text/plain`       | `No token provided`                                                                                       |
-| `403`     | `text/plain`       | `Invalid token`                                                                                           |
-| `404`     | `text/plain`       | `User not found`                                                                                          |
+| http code | content-type       | response                                                                                                         |
+| --------- | ------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `200`     | `application/json` | `{"email": "user's email", "username": "user's name", "role": "user" \| "host", "phone_number": "user's phone"}` |
+| `401`     | `text/plain`       | `No token provided`                                                                                              |
+| `403`     | `text/plain`       | `Invalid token`                                                                                                  |
+| `404`     | `text/plain`       | `User not found`                                                                                                 |
 
 </details>
 
@@ -85,24 +83,24 @@
 
 ##### Headers
 
-| key            | required | data type | description         |
-| -------------- | -------- | --------- | ------------------- |
+| key             | required | data type | description             |
+| --------------- | -------- | --------- | ----------------------- |
 | `Authorization` | true     | string    | Bearer token from login |
 
 ##### Body (application/json)
 
-| key          | required | data type | description          |
-| ------------ | -------- | --------- | -------------------- |
-| `username`   | false    | string    | User's updated name  |
-| `phone_number` | false  | string    | User's updated phone |
+| key            | required | data type | description          |
+| -------------- | -------- | --------- | -------------------- |
+| `username`     | false    | string    | User's updated name  |
+| `phone_number` | false    | string    | User's updated phone |
 
 ##### Responses
 
-| http code | content-type       | response                                                                                                   |
-| --------- | ------------------ | ---------------------------------------------------------------------------------------------------------- |
-| `200`     | `application/json` | `{"email": "user's email", "username": "user's updated name", "role": "user" \| "admin" \| "coach", "phone_number": "updated phone"}` |
-| `401`     | `text/plain`       | `No token provided`                                                                                       |
-| `403`     | `text/plain`       | `Invalid token`                                                                                           |
-| `500`     | `text/plain`       | `Internal server error`                                                                                   |
+| http code | content-type       | response                                                                                                                  |
+| --------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `200`     | `application/json` | `{"email": "user's email", "username": "user's updated name", "role": "user" \| "host", "phone_number": "updated phone"}` |
+| `401`     | `text/plain`       | `No token provided`                                                                                                       |
+| `403`     | `text/plain`       | `Invalid token`                                                                                                           |
+| `500`     | `text/plain`       | `Internal server error`                                                                                                   |
 
 </details>
