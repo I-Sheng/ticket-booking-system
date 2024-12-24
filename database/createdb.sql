@@ -26,8 +26,8 @@ CREATE TABLE "activities" (
   "end_time" timestamp,
   "title" varchar,
   "content" varchar,
-  "cover_img" varchar,
-  "price_level_img" varchar,
+  "cover_img" bytea,
+  "price_level_img" bytea,
   "arena_id" uuid
 );
 
