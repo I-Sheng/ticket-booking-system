@@ -19,11 +19,11 @@ VALUES
 -- Generate test data for `activities`
 INSERT INTO "activities" ("on_sale_date", "start_time", "end_time", "title", "content", "cover_img", "price_level_img", "arena_id")
 VALUES
-('2024-12-01', '2024-12-15 19:00:00', '2024-12-15 21:00:00', 'Concert A', 'A wonderful evening of music.', 'cover_a.jpg', 'price_a.jpg', (SELECT _id FROM "arenas" LIMIT 1 OFFSET 0)),
-('2024-12-05', '2024-12-20 18:00:00', '2024-12-20 20:00:00', 'Basketball Game B', 'Exciting match!', 'cover_b.jpg', 'price_b.jpg', (SELECT _id FROM "arenas" LIMIT 1 OFFSET 1)),
-('2024-12-10', '2024-12-25 20:00:00', '2024-12-25 22:00:00', 'Drama C', 'A captivating performance.', 'cover_c.jpg', 'price_c.jpg', (SELECT _id FROM "arenas" LIMIT 1 OFFSET 2)),
-('2024-12-15', '2024-12-30 19:30:00', '2024-12-30 21:30:00', 'Rock Concert D', 'An electrifying show.', 'cover_d.jpg', 'price_d.jpg', (SELECT _id FROM "arenas" LIMIT 1 OFFSET 3)),
-('2024-12-20', '2024-12-31 18:00:00', '2024-12-31 20:00:00', 'Comedy Show E', 'An evening of laughter.', 'cover_e.jpg', 'price_e.jpg', (SELECT _id FROM "arenas" LIMIT 1 OFFSET 4));
+('2024-12-01', '2024-12-15 19:00:00', '2024-12-15 21:00:00', 'Concert A', 'A wonderful evening of music.', null, null, (SELECT _id FROM "arenas" LIMIT 1 OFFSET 0)),
+('2024-12-05', '2024-12-20 18:00:00', '2024-12-20 20:00:00', 'Basketball Game B', 'Exciting match!',  null, null , (SELECT _id FROM "arenas" LIMIT 1 OFFSET 1)),
+('2024-12-10', '2024-12-25 20:00:00', '2024-12-25 22:00:00', 'Drama C', 'A captivating performance.',  null, null, (SELECT _id FROM "arenas" LIMIT 1 OFFSET 2)),
+('2024-12-15', '2024-12-30 19:30:00', '2024-12-30 21:30:00', 'Rock Concert D', 'An electrifying show.',  null, null, (SELECT _id FROM "arenas" LIMIT 1 OFFSET 3)),
+('2024-12-20', '2024-12-31 18:00:00', '2024-12-31 20:00:00', 'Comedy Show E', 'An evening of laughter.',  null, null, (SELECT _id FROM "arenas" LIMIT 1 OFFSET 4));
 
 -- Generate test data for `regions`
 INSERT INTO "regions" ("activity_id", "region_name", "region_price", "region_capacity")
