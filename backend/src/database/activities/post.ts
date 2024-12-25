@@ -6,8 +6,8 @@ export async function createActivity(data: {
   end_time: string;
   title: string;
   content?: string;
-  cover_img?: string;
-  price_level_img?: string;
+  cover_img?: Buffer | null; // Accept Buffer for binary data
+  price_level_img?: Buffer | null; // Accept Buffer for binary data
   arena_id: string;
 }) {
   const qstring = `
@@ -21,8 +21,8 @@ export async function createActivity(data: {
     data.end_time,
     data.title,
     data.content || null,
-    data.cover_img || null,
-    data.price_level_img || null,
+    data.cover_img || null, // Insert binary data
+    data.price_level_img || null, // Insert binary data
     data.arena_id,
   ];
 
