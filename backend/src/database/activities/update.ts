@@ -7,8 +7,8 @@ export async function updateActivity(data: {
   end_time?: string;
   title?: string;
   content?: string;
-  cover_img?: string;
-  price_level_img?: string;
+  cover_img?: Buffer | null; // Updated type to handle binary data
+  price_level_img?: Buffer | null; // Updated type to handle binary data
   arena_id?: string;
 }) {
   const fields = [];
@@ -35,13 +35,13 @@ export async function updateActivity(data: {
     fields.push(`content = $${index++}`);
     values.push(data.content);
   }
-  if (data.cover_img) {
+  if (data.cover_img !== undefined) {
     fields.push(`cover_img = $${index++}`);
-    values.push(data.cover_img);
+    values.push(data.cover_img); // Handles null for deletion or Buffer for update
   }
-  if (data.price_level_img) {
+  if (data.price_level_img !== undefined) {
     fields.push(`price_level_img = $${index++}`);
-    values.push(data.price_level_img);
+    values.push(data.price_level_img); // Handles null for deletion or Buffer for update
   }
   if (data.arena_id) {
     fields.push(`arena_id = $${index++}`);
