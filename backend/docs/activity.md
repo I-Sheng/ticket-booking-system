@@ -9,7 +9,7 @@
 > | ------------- | -------------- | ------------- |
 > | Authorization | `Bearer token` | The JWT token |
 
-##### Body (application/json or application/x-www-form-urlencoded)
+##### Body (application/form-data)
 
 > | key               | required | data type | description                          |
 > | ----------------- | -------- | --------- | ------------------------------------ |
@@ -18,8 +18,8 @@
 > | end_time          | true     | string    | End time of the activity (ISO 8601)   |
 > | title             | true     | string    | Title of the activity                |
 > | content           | false    | string    | Description or content of the activity |
-> | cover_img         | false    | string    | URL of the cover image               |
-> | price_level_img   | false    | string    | URL of the price level image         |
+> | cover_img         | false    | file    | file of the cover image               |
+> | price_level_img   | false    | file    | file of the price level image         |
 > | arena_id          | true     | string    | UUID of the arena hosting the activity |
 
 ##### Responses
@@ -85,7 +85,7 @@
 > | ------------- | -------------- | ------------- |
 > | Authorization | `Bearer token` | The JWT token |
 
-##### Body (application/json)
+##### Body (application/form-data)
 
 > | key               | required | data type | description                          |
 > | ----------------- | -------- | --------- | ------------------------------------ |
@@ -95,8 +95,8 @@
 > | end_time          | false    | string    | Updated end time (ISO 8601)         |
 > | title             | false    | string    | Updated title of the activity       |
 > | content           | false    | string    | Updated content of the activity     |
-> | cover_img         | false    | string    | Updated URL of the cover image      |
-> | price_level_img   | false    | string    | Updated URL of the price level image|
+> | cover_img         | false    | file    | Updated file of the cover image      |
+> | price_level_img   | false    | file    | Updated file of the price level image|
 > | arena_id          | false    | string    | Updated UUID of the arena hosting the activity |
 
 ##### Responses
