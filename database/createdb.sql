@@ -30,7 +30,7 @@ CREATE TABLE "activities" (
   "price_level_img" bytea,
   "arena_id" uuid,
   "creator_id" uuid,
-  "is_arichived" boolean default false
+  "is_archived" boolean default false
 );
 
 CREATE TABLE "regions" (
