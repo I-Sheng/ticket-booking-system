@@ -1,6 +1,10 @@
 import express from 'express'
 import multer from 'multer'
-import { listActivities, getActivityById } from '../../database/activities/get'
+import {
+  listActivities,
+  getActivityById,
+  listActivitiesByCreatorId,
+} from '../../database/activities/get'
 import { createActivity } from '../../database/activities/post'
 import { createActivityWithRegions } from '../../database/activities/post'
 import { createRegion } from '../../database/regions/post'
@@ -15,7 +19,7 @@ const router = express.Router()
 const upload = multer()
 
 // Create a new activity
-import { createTicket } from '../../database/tickets/post' // 假設 createTicket 函數位於此處
+import { createTicket } from '../../database/tickets/post'
 
 router.post(
   '/create',
@@ -311,6 +315,33 @@ router.get('/:activity_id', async (req, res) => {
     return res.status(500).json({ error: 'Internal Server Error' })
   }
 })
+
+// Get all activities by a specific creator
+router.get(
+  '/creator/:creator_id',
+  jwtProtect,
+  hostProtect,
+  async (req, res) => {
+    try {
+      const { creator_id } = req.params
+
+      // Fetch activities created by the specified creator
+      const activities = await listActivitiesByCreatorId(creator_id)
+
+      if ('error' in activities) {
+        return res.status(404).json({ error: activities.error })
+      }
+
+      return res.status(200).json({
+        message: 'Activities retrieved successfully',
+        activities: activities,
+      })
+    } catch (error) {
+      console.error('Error in GET /activities/creator/:creator_id:', error)
+      return res.status(500).json({ error: 'Internal Server Error' })
+    }
+  }
+)
 
 // update the activity information except region, e.g. title, content, start_time...
 router.patch(
