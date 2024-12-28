@@ -75,8 +75,6 @@ export async function createActivityWithRegions(data: {
   }
 }
 
-// import { query } from '../database';
-//
 export async function createActivity(data: {
   on_sale_date: string
   start_time: string
