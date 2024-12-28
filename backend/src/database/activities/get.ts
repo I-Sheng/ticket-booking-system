@@ -2,7 +2,7 @@ import { query } from '../database';
 
 export async function listActivities(arena_id?: string) {
   let qstring = `
-    SELECT * FROM activities
+    SELECT * FROM activities WHERE is_archived = false
   `;
   const values: string[] = [];
 

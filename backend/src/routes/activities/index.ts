@@ -3,8 +3,11 @@ import multer from 'multer'
 import { listActivities, getActivityById } from '../../database/activities/get'
 import { createActivity } from '../../database/activities/post'
 import { createActivityWithRegions } from '../../database/activities/post'
+import { createRegion } from '../../database/regions/post'
 import { updateActivity } from '../../database/activities/update'
 import { deleteActivity } from '../../database/activities/delete'
+import { listRegions } from '../../database/regions/get'
+
 import { jwtProtect, hostProtect } from '../middleware'
 
 const router = express.Router()
@@ -149,7 +152,7 @@ router.post(
         message: 'Activity and tickets created successfully',
         activity: result.activity,
         regions: result.regions,
-        tickets: tickets,
+        //tickets: tickets,
       })
     } catch (error) {
       console.error('Error in POST /activities/create:', error)
@@ -158,39 +161,94 @@ router.post(
   }
 )
 
-// // List all activities
-// router.get('/list', async (req, res) => {
-//   try {
-//     const { arena_id } = req.query;
-//     const result = await listActivities(arena_id as string);
+router.post(
+  '/:activity_id/regions',
+  jwtProtect,
+  hostProtect,
+  async (req, res) => {
+    try {
+      const { activity_id } = req.params // Extract activity ID from route
+      const { region_name, region_price, region_capacity } = req.body // Extract region details from the request body
+      const { decoded } = req.body // Extract user info from JWT
 
-//     if ('error' in result) {
-//       return res.status(404).json({ error: result.error });
-//     }
-//     return res.status(200).json({ activities: result });
-//   } catch (error) {
-//     console.error('Error in GET /activities/list:', error);
-//     return res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// });
+      // Validate inputs
+      if (!region_name || !region_price || !region_capacity) {
+        return res.status(400).json({
+          error: 'region_name, region_price, and region_capacity are required.',
+        })
+      }
 
-// // Get an activity by its ID
-// router.get('/get/:activity_id', async (req, res) => {
-//   try {
-//     const { activity_id } = req.params;
-//     const result = await getActivityById(activity_id);
+      if (region_price <= 0 || region_capacity <= 0) {
+        return res.status(400).json({
+          error: 'region_price and region_capacity must be positive values.',
+        })
+      }
+      // Fetch activity details to validate time restrictions
+      const activity = await getActivityById(activity_id)
+      if (!activity) {
+        return res.status(404).json({ error: 'Activity not found' })
+      }
 
-//     if ('error' in result) {
-//       return res.status(404).json({ error: result.error });
-//     }
-//     return res.status(200).json(result);
-//   } catch (error) {
-//     console.error('Error in GET /activities/get/:activity_id:', error);
-//     return res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// });
+      // Check if the user is the creator of the activity
+      if (activity.creator_id !== decoded._id) {
+        return res
+          .status(403)
+          .json({ error: 'Only the creator can add regions.' })
+      }
 
-// List all activities
+      const now = new Date()
+      const startTime = new Date(activity.start_time)
+
+      // Check if the current time is before the activity's start time
+      if (now >= startTime) {
+        return res.status(400).json({
+          error: 'Cannot add regions after the activity has started.',
+        })
+      }
+
+      // Add the region to the activity
+      const newRegion = await createRegion({
+        activity_id,
+        region_name,
+        region_price,
+        region_capacity,
+      })
+
+      if ('error' in newRegion) {
+        return res.status(400).json({ error: newRegion.error })
+      }
+
+      // Automatically create tickets for the new region
+      const tickets = []
+      for (let seatNumber = 1; seatNumber <= region_capacity; seatNumber++) {
+        const ticket = await createTicket({
+          user_id: null, // Ticket not assigned to any user initially
+          activity_id,
+          region_id: newRegion._id,
+          seat_number: seatNumber,
+          is_paid: false, // Default to unpaid
+        })
+
+        if ('error' in ticket) {
+          throw new Error(`Failed to create ticket: ${ticket.error}`)
+        }
+
+        tickets.push(ticket)
+      }
+
+      return res.status(201).json({
+        message: 'Region and tickets added successfully',
+        region: newRegion,
+        // tickets: tickets,
+      })
+    } catch (error) {
+      console.error('Error in POST /:activity_id/regions:', error)
+      return res.status(500).json({ error: 'Internal Server Error' })
+    }
+  }
+)
+
+// List all active activities
 router.get('/list', async (req, res) => {
   try {
     const { arena_id } = req.query
@@ -220,129 +278,173 @@ router.get('/list', async (req, res) => {
   }
 })
 
-// Get an activity by its ID
-router.get('/get/:activity_id', async (req, res) => {
+router.get('/:activity_id', async (req, res) => {
   try {
     const { activity_id } = req.params
-    const result = await getActivityById(activity_id)
 
-    if ('error' in result) {
-      return res.status(404).json({ error: result.error })
+    // Fetch activity details
+    const activity = await getActivityById(activity_id)
+    if (!activity) {
+      return res.status(404).json({ error: 'Activity not found' })
     }
 
-    // Convert binary image data to Base64
-    result.cover_img = result.cover_img
-      ? `data:image/jpeg;base64,${result.cover_img.toString('base64')}`
-      : null
-    result.price_level_img = result.price_level_img
-      ? `data:image/jpeg;base64,${result.price_level_img.toString('base64')}`
-      : null
+    // Fetch regions for the activity
+    const regions = await listRegions(activity_id)
 
-    return res.status(200).json(result)
+    if ('error' in regions) {
+      return res.status(404).json({ error: regions.error })
+    }
+
+    // Combine activity details and regions in the response
+    return res.status(200).json({
+      message: 'Activity and regions retrieved successfully',
+      activity: {
+        ...activity,
+        regions: regions, // Add regions to the activity response
+      },
+    })
   } catch (error) {
-    console.error('Error in GET /activities/get/:activity_id:', error)
+    console.error('Error in GET /:activity_id:', error)
     return res.status(500).json({ error: 'Internal Server Error' })
   }
 })
 
-// // Update an activity
-// router.patch('/update',jwtProtect, hostProtect, async (req, res) => {
-//   try {
-//     const result = await updateActivity(req.body);
+router.patch('/:activity_id', jwtProtect, hostProtect, async (req, res) => {
+  try {
+    const { activity_id } = req.params
+    const { title, content, on_sale_date, start_time, end_time } = req.body
 
-//     if ('error' in result) {
-//       return res.status(404).json({ error: result.error });
-//     }
-//     return res.status(200).json({ message: 'Activity updated successfully', activity: result });
-//   } catch (error) {
-//     console.error('Error in PATCH /activities/update:', error);
-//     return res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// });
+    // Fetch the activity details
+    const activity = await getActivityById(activity_id)
+    if (!activity) {
+      return res.status(404).json({ error: 'Activity not found' })
+    }
 
+    // Ensure the requester is the creator
+    const { decoded } = req.body // Extract the authenticated user from the request
+    if (activity.creator_id !== decoded._id) {
+      return res
+        .status(403)
+        .json({ error: 'Only the creator can update the activity.' })
+    }
+
+    const now = new Date()
+    const onSaleDate = new Date(activity.on_sale_date)
+
+    // Validate fields restricted to updates before the on-sale date
+    if (now >= onSaleDate) {
+      if (
+        title !== undefined ||
+        on_sale_date !== undefined ||
+        start_time !== undefined ||
+        end_time !== undefined
+      ) {
+        return res.status(400).json({
+          error:
+            'Title, on-sale date, start time, and end time can only be updated before the on-sale date.',
+        })
+      }
+    }
+
+    // Validate updated fields
+    if (on_sale_date && new Date(on_sale_date) <= now) {
+      return res.status(400).json({
+        error: 'The new on-sale date must be in the future.',
+      })
+    }
+
+    if (
+      start_time &&
+      new Date(start_time) <= new Date(on_sale_date || activity.on_sale_date)
+    ) {
+      return res.status(400).json({
+        error: 'The start time must be after the on-sale date.',
+      })
+    }
+
+    if (
+      end_time &&
+      new Date(end_time) <= new Date(start_time || activity.start_time)
+    ) {
+      return res.status(400).json({
+        error: 'The end time must be after the start time.',
+      })
+    }
+
+    // Prepare the update object
+    const updateFields: { [key: string]: any } = {}
+    if (title !== undefined) updateFields.title = title
+    if (content !== undefined) updateFields.content = content
+    if (on_sale_date !== undefined) updateFields.on_sale_date = on_sale_date
+    if (start_time !== undefined) updateFields.start_time = start_time
+    if (end_time !== undefined) updateFields.end_time = end_time
+
+    // Update the activity in the database
+    const updatedActivity = await updateActivity({
+      activity_id, // Pass the activity ID
+      ...updateFields, // Spread the fields to update
+    })
+    if ('error' in updatedActivity) {
+      return res.status(400).json({ error: updatedActivity.error })
+    }
+
+    return res.status(200).json({
+      message: 'Activity updated successfully',
+      activity: updatedActivity,
+    })
+  } catch (error) {
+    console.error('Error in PATCH /:activity_id:', error)
+    return res.status(500).json({ error: 'Internal Server Error' })
+  }
+})
+
+//
+// delete(archive) an activity
 router.patch(
-  '/update',
+  '/:activity_id/archive',
   jwtProtect,
   hostProtect,
-  upload.fields([{ name: 'cover_img' }, { name: 'price_level_img' }]), // Handle image uploads
   async (req, res) => {
     try {
-      const {
-        activity_id,
-        on_sale_date,
-        start_time,
-        end_time,
-        title,
-        content,
-        arena_id,
-      } = req.body
+      const { activity_id } = req.params
 
-      // Extract image buffers from uploaded files
-      const files = req.files as
-        | { [fieldname: string]: Express.Multer.File[] }
-        | undefined
-      const coverImg = files?.['cover_img']?.[0]?.buffer || null
-      const priceLevelImg = files?.['price_level_img']?.[0]?.buffer || null
+      // Fetch the activity details
+      const activity = await getActivityById(activity_id)
+      if (!activity) {
+        return res.status(404).json({ error: 'Activity not found.' })
+      }
 
-      // Pass data directly to the updateActivity function
-      const result = await updateActivity({
+      // Ensure the requester is the creator
+      const { decoded } = req.body // Extract the authenticated user from the request
+      if (activity.creator_id !== decoded._id) {
+        return res
+          .status(403)
+          .json({ error: 'Only the creator can archive the activity.' })
+      }
+
+      // Check if the activity is already archived
+      if (activity.is_archived) {
+        return res.status(400).json({ error: 'Activity is already archived.' })
+      }
+
+      // Update the activity's `is_archived` field to `true`
+      const updatedActivity = await updateActivity({
         activity_id,
-        on_sale_date,
-        start_time,
-        end_time,
-        title,
-        content,
-        cover_img: coverImg,
-        price_level_img: priceLevelImg,
-        arena_id,
+        is_archived: true,
       })
 
-      if ('error' in result) {
-        return res.status(404).json({ error: result.error })
-      }
-
-      // Convert images to Base64 for response
-      if (result.cover_img) {
-        result.cover_img = `data:image/jpeg;base64,${result.cover_img.toString(
-          'base64'
-        )}`
-      }
-      if (result.price_level_img) {
-        result.price_level_img = `data:image/jpeg;base64,${result.price_level_img.toString(
-          'base64'
-        )}`
+      if ('error' in updatedActivity) {
+        return res.status(400).json({ error: updatedActivity.error })
       }
 
       return res.status(200).json({
-        message: 'Activity updated successfully',
-        activity: result,
+        message: 'Activity archived successfully.',
+        activity: updatedActivity,
       })
     } catch (error) {
-      console.error('Error in PATCH /activities/update:', error)
+      console.error('Error in PATCH /:activity_id/archive:', error)
       return res.status(500).json({ error: 'Internal Server Error' })
     }
   }
 )
-
-// Delete an activity
-router.delete('/delete', jwtProtect, hostProtect, async (req, res) => {
-  try {
-    const { activity_id } = req.body
-
-    if (!activity_id) {
-      return res.status(400).json({ error: 'activity_id is required' })
-    }
-
-    const result = await deleteActivity(activity_id)
-
-    if ('error' in result) {
-      return res.status(404).json({ error: result.error })
-    }
-    return res.status(200).json({ message: 'Activity deleted successfully' })
-  } catch (error) {
-    console.error('Error in DELETE /activities/delete:', error)
-    return res.status(500).json({ error: 'Internal Server Error' })
-  }
-})
-
 export default router
