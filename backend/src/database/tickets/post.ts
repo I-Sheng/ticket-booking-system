@@ -1,7 +1,7 @@
 import { query } from '../database';
 
 export async function createTicket(data: {
-  user_id: string;
+  user_id: string | null;
   activity_id: string;
   region_id: string;
   seat_number: number;

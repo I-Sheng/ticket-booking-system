@@ -14,6 +14,7 @@ export async function getUser(mail: string) {
   if (!res || !res.rowCount) return { error: 'user not found' }
   if (res.rowCount === 0) return { error: 'user not found' }
   return {
+    _id: res.rows[0]._id,
     email: res.rows[0].email,
     password: res.rows[0].password,
     username: res.rows[0].username,
