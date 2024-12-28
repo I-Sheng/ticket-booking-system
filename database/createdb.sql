@@ -21,14 +21,16 @@ CREATE TABLE "arenas" (
 
 CREATE TABLE "activities" (
   "_id" uuid not null default uuid_generate_v4() PRIMARY KEY,
-  "on_sale_date" date,
+  "on_sale_date" timestamp,
   "start_time" timestamp,
   "end_time" timestamp,
   "title" varchar,
   "content" varchar,
   "cover_img" bytea,
   "price_level_img" bytea,
-  "arena_id" uuid
+  "arena_id" uuid,
+  "creator_id" uuid,
+  "is_arichived" boolean default false
 );
 
 CREATE TABLE "regions" (
@@ -55,5 +57,7 @@ ALTER TABLE "tickets" ADD FOREIGN KEY ("activity_id") REFERENCES "activities" ("
 ALTER TABLE "tickets" ADD FOREIGN KEY ("region_id") REFERENCES "regions" ("_id");
 
 ALTER TABLE "activities" ADD FOREIGN KEY ("arena_id") REFERENCES "arenas" ("_id");
+
+ALTER TABLE "activities" ADD FOREIGN KEY ("creator_id") REFERENCES "users" ("_id");
 
 ALTER TABLE "regions" ADD FOREIGN KEY ("activity_id") REFERENCES "activities" ("_id");
