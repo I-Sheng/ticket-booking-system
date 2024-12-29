@@ -387,7 +387,7 @@ router.patch(
 
 // delete(archive) an activity
 router.patch(
-  '/:activity_id/archive',
+  '/archive/:activity_id',
   jwtProtect,
   hostProtect,
   async (req, res) => {
