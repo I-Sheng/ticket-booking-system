@@ -1,10 +1,10 @@
 -- Generate test data for `users`
 INSERT INTO "users" ("email", "username", "password", "role", "phone_number", "is_disabled")
 VALUES
-('user1@example.com', 'Alice', 'password1', 'admin', '1234567890', false),
+('user1@example.com', 'Alice', 'password1', 'host', '1234567890', false),
 ('user2@example.com', 'Bob', 'password2', 'user', '0987654321', false),
 ('user3@example.com', 'Charlie', 'password3', 'user', '1122334455', true),
-('user4@example.com', 'Daisy', 'password4', 'admin', '2233445566', false),
+('user4@example.com', 'Daisy', 'password4', 'host', '2233445566', false),
 ('user5@example.com', 'Eve', 'password5', 'user', '5566778899', false);
 
 -- Generate test data for `arenas`
@@ -17,13 +17,13 @@ VALUES
 ('Northside Arena', '202 Pine St, Northville', 3500);
 
 -- Generate test data for `activities`
-INSERT INTO "activities" ("on_sale_date", "start_time", "end_time", "title", "content", "cover_img", "price_level_img", "arena_id")
+INSERT INTO "activities" ("on_sale_date", "start_time", "end_time", "title", "content", "cover_img", "price_level_img", "arena_id", "creator_id")
 VALUES
-('2024-12-01', '2024-12-15 19:00:00', '2024-12-15 21:00:00', 'Concert A', 'A wonderful evening of music.', null, null, (SELECT _id FROM "arenas" LIMIT 1 OFFSET 0)),
-('2024-12-05', '2024-12-20 18:00:00', '2024-12-20 20:00:00', 'Basketball Game B', 'Exciting match!',  null, null , (SELECT _id FROM "arenas" LIMIT 1 OFFSET 1)),
-('2024-12-10', '2024-12-25 20:00:00', '2024-12-25 22:00:00', 'Drama C', 'A captivating performance.',  null, null, (SELECT _id FROM "arenas" LIMIT 1 OFFSET 2)),
-('2024-12-15', '2024-12-30 19:30:00', '2024-12-30 21:30:00', 'Rock Concert D', 'An electrifying show.',  null, null, (SELECT _id FROM "arenas" LIMIT 1 OFFSET 3)),
-('2024-12-20', '2024-12-31 18:00:00', '2024-12-31 20:00:00', 'Comedy Show E', 'An evening of laughter.',  null, null, (SELECT _id FROM "arenas" LIMIT 1 OFFSET 4));
+('2024-12-01 12:00:00', '2024-12-15 19:00:00', '2024-12-15 21:00:00', 'Concert A', 'A wonderful evening of music.', null, null, (SELECT _id FROM "arenas" LIMIT 1 OFFSET 0), (SELECT _id FROM "users" WHERE "role" = 'host' LIMIT 1 OFFSET 0)),
+('2024-12-05 12:00:00', '2024-12-20 18:00:00', '2024-12-20 20:00:00', 'Basketball Game B', 'Exciting match!',  null, null , (SELECT _id FROM "arenas" LIMIT 1 OFFSET 1), (SELECT _id FROM "users" WHERE "role" = 'host' LIMIT 1 OFFSET 1)),
+('2024-12-10 12:00:00', '2024-12-25 20:00:00', '2024-12-25 22:00:00', 'Drama C', 'A captivating performance.',  null, null, (SELECT _id FROM "arenas" LIMIT 1 OFFSET 2), (SELECT _id FROM "users" WHERE "role" = 'host' LIMIT 1 OFFSET 0)),
+('2024-12-15 12:00:00', '2024-12-30 19:30:00', '2024-12-30 21:30:00', 'Rock Concert D', 'An electrifying show.',  null, null, (SELECT _id FROM "arenas" LIMIT 1 OFFSET 3), (SELECT _id FROM "users" WHERE "role" = 'host' LIMIT 1 OFFSET 1)),
+('2024-12-20 12:00:00', '2024-12-31 18:00:00', '2024-12-31 20:00:00', 'Comedy Show E', 'An evening of laughter.',  null, null, (SELECT _id FROM "arenas" LIMIT 1 OFFSET 4), (SELECT _id FROM "users" WHERE "role" = 'host' LIMIT 1 OFFSET 0));
 
 -- Generate test data for `regions`
 INSERT INTO "regions" ("activity_id", "region_name", "region_price", "region_capacity")
