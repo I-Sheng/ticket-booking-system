@@ -48,7 +48,6 @@ export async function listActivitiesByCreatorId(creator_id: string) {
   const qstring = `
     SELECT * FROM activities
     WHERE creator_id = $1
-    AND is_archived = false; -- Exclude archived activities
   `;
   try {
     const result = await query(qstring, [creator_id]);
