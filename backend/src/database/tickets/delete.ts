@@ -1,17 +1,19 @@
-import { query } from '../database';
+import { query } from '../database'
 
-export async function deleteTicket(ticket_id: string) {
+export async function deleteExcessTickets(
+  region_id: string,
+  max_capacity: number
+) {
   const qstring = `
-    DELETE FROM tickets WHERE _id = $1 RETURNING *;
-  `;
+    DELETE FROM tickets
+    WHERE region_id = $1 AND seat_number > $2;
+  `
+
   try {
-    const result = await query(qstring, [ticket_id]);
-    if (result.rowCount === 0) {
-      return { error: 'Ticket not found' };
-    }
-    return { message: 'Ticket deleted successfully' };
+    const result = await query(qstring, [region_id, max_capacity])
+    return { deletedCount: result.rowCount } // Return the number of deleted rows
   } catch (error) {
-    console.error('Error deleting ticket:', error);
-    return { error: 'Failed to delete ticket' };
+    console.error('Error deleting excess tickets:', error)
+    return { error: 'Failed to delete excess tickets.' }
   }
 }
