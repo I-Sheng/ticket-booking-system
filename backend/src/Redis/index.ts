@@ -56,7 +56,7 @@ export const readTicket = async (ticket_id: string): Promise<Ticket | null> => {
   const key = getRedisKey(ticket_id);
   const data = await redis.hgetall(key);
 
-  if (!data || Object.keys(data).length === 0) {
+  if (Object.keys(data).length === 0) {
     return null; // Ticket not found
   }
 
@@ -166,3 +166,8 @@ export const migrateTicketsToPostgres = async (): Promise<void> => {
 
   console.log("Migration completed successfully.");
 };
+
+// Example usage (uncomment to test)
+// (async () => {
+//   await migrateTicketsToPostgres();
+// })();
