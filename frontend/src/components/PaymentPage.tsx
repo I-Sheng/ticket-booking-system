@@ -3,8 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom'
 const API_URL = process.env.REACT_APP_API_URL
 
 const PaymentPage: React.FC = () => {
-  const { ticketId } = useParams<{ ticketId: string }>()
-  const [ticket, setTicket] = useState<any>(null)  // 儲存票據詳情
+  const { id } = useParams()
+  const [ticket, setTicket] = useState<any>(null) // 儲存票據詳情
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -15,8 +15,11 @@ const PaymentPage: React.FC = () => {
     try {
       setLoading(true)
       const response = await fetch(`${API_URL}/tickets/${id}`)
-      const data = response.json()  // 使用 API 獲取票據信息
-      setTicket(data)
+      if (response.ok) {
+        const data = response.json() // 使用 API 獲取票據信息
+        setTicket(data)
+        setLoading(false)
+      }
     } catch (error: any) {
       setError('無法獲取票據詳情')
     } finally {
@@ -26,10 +29,10 @@ const PaymentPage: React.FC = () => {
 
   // 用戶在初始化頁面時加載票據詳細信息
   useEffect(() => {
-    if (ticketId) {
-      fetchTicketDetails(ticketId)
+    if (id) {
+      fetchTicketDetails(id)
     }
-  }, [ticketId])
+  }, [id])
 
   const handlePayment = async () => {
     try {
@@ -37,7 +40,7 @@ const PaymentPage: React.FC = () => {
       console.log('開始付款處理...')
       // 完成支付後，將票務設置為已付款，或者調用API更新支付狀態
       // 用navigate來導向成功頁面或主頁
-      navigate(`/payment-success/${ticketId}`)
+      navigate(`/payment-success/${id}`)
     } catch (error) {
       setError('付款失敗，請重試。')
     }
@@ -52,20 +55,32 @@ const PaymentPage: React.FC = () => {
   }
 
   if (!ticket) {
-    return <div>找不到相應的票據。</div>
+    return <div>找不到相應的票據{id}。</div>
   }
 
   return (
     <div style={{ padding: '20px', maxWidth: '600px', margin: 'auto' }}>
       <h2>付款頁面</h2>
-      
+
       {/* 顯示票據詳細信息 */}
       <div>
         <h3>訂單詳情</h3>
-        <p><strong>訂單編號: </strong>{ticket._id}</p>
-        <p><strong>活動名稱: </strong>{ticket.activity.title}</p>
-        <p><strong>座位號: </strong>{ticket.seat_number}</p>
-        <p><strong>區域: </strong>{ticket.region_name}</p>
+        <p>
+          <strong>訂單編號: </strong>
+          {ticket._id}
+        </p>
+        <p>
+          <strong>活動名稱: </strong>
+          {ticket.activity.title}
+        </p>
+        <p>
+          <strong>座位號: </strong>
+          {ticket.seat_number}
+        </p>
+        <p>
+          <strong>區域: </strong>
+          {ticket.region_name}
+        </p>
         <p>
           <strong>總額: </strong>￥{ticket.price}
         </p>
@@ -91,7 +106,7 @@ const PaymentPage: React.FC = () => {
       {/* 返回按鈕，返回票據詳細頁或訂單頁面 */}
       <div style={{ marginTop: '10px' }}>
         <button
-          onClick={() => navigate(-1)}  // 使用navigate(-1)來返回上一頁
+          onClick={() => navigate(-1)} // 使用navigate(-1)來返回上一頁
           style={{
             padding: '10px 20px',
             backgroundColor: '#007bff',
@@ -110,4 +125,3 @@ const PaymentPage: React.FC = () => {
 }
 
 export default PaymentPage
-

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { Link } from 'react-router-dom'
 
 const API_URL = process.env.REACT_APP_API_URL
 
@@ -277,8 +278,8 @@ const MyTicket: React.FC = () => {
                       }}
                     >
                       {/* 如果未付款，顯示付款連結 */}
-                      <a
-                        href={`/payment/${ticket._id}`} // 假設支付頁面的連結結構
+                      <Link
+                        to={`/payment/${ticket._id}`} // 假設支付頁面的連結結構
                         style={{
                           color: '#007bff',
                           textDecoration: 'none',
@@ -286,7 +287,7 @@ const MyTicket: React.FC = () => {
                         }}
                       >
                         前往付款
-                      </a>
+                      </Link>
                     </td>
                   )}
                 </tr>

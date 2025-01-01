@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { getArena } from '../context/kits'
 
 const API_URL = process.env.REACT_APP_API_URL
@@ -33,6 +34,7 @@ interface Activity {
 
 const BuyTicketPage: React.FC = () => {
   const { id } = useParams() // 獲取活動ID
+  const { jwtToken } = useAuth()
   const [activity, setActivity] = useState<Activity | null>(null)
   const [arena, setArena] = useState<Arena | null>(null)
   const [selectedRegion, setSelectedRegion] = useState<string>('') // 選擇區域
@@ -80,30 +82,33 @@ const BuyTicketPage: React.FC = () => {
   }
 
   // 提交購票
+  const reserveTickets = async () => {
+    try {
+      const response = await fetch(`${API_URL}/tickets/reserveTicket`, {
+        method: 'POST',
+        headers: {
+          Authorization: `${jwtToken}`,
+        },
+        body: JSON.stringify({
+          regionId: selectedRegion,
+        }),
+      })
+      if (response.ok) {
+        const data = await response.json()
+        alert('購票成功！')
+      }else{
+        alert('Failed to reserve ticket')
+      }
+    } catch {}
+  }
   const handleBuyTickets = () => {
     if (!selectedRegion || ticketQuantity <= 0) {
       alert('請選擇區域並輸入有效的數量')
       return
     }
+    reserveTickets()
 
     // 在此執行實際的購票邏輯，如 API 提交等
-    const reserveTickets = async () => {
-      try {
-        const response = await fetch(`${API_URL}/tickets/reserveTicket`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            regionId: selectedRegion,
-          }),
-        })
-        if (response.ok) {
-          const data = await response.json()
-          alert('購票成功！')
-        }
-      } catch {}
-    }
   }
 
   if (!activity || !arena) {
