@@ -28,10 +28,9 @@ interface Activity {
 const ActivityPage: React.FC = () => {
   const { id } = useParams() // 获取活动的 ID
   const [activity, setActivity] = useState<Activity | null>(null)
-  const [status, setStatus] = useState<string>('')
   const fetchActivity = async (id: string) => {
     try {
-      const response = await fetch(`${API_URL}/activities/get/${id}`, {
+      const response = await fetch(`${API_URL}/activities/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -39,15 +38,11 @@ const ActivityPage: React.FC = () => {
       })
       if (response.ok) {
         const data = await response.json()
-        console.log('data',data)
-        setStatus('ok')
         setActivity(data.activity) // 假设后端返回的数据中包含 activity 属性
       } else {
-        setStatus('error')
         console.error('Failed to fetch activity:', response.statusText)
       }
     } catch (error) {
-      setStatus('error')
       console.error('Error fetching activity:', error)
     }
   }
@@ -59,24 +54,18 @@ const ActivityPage: React.FC = () => {
     return (
       <>
         <p>loading...</p>
-        <p>{status}</p>
       </>
     )
   }
 
   return (
     <div>
-      <p>{activity?.title}</p>
-      {/* <h2>{activity.name}</h2> */}
-      {/* <p> */}
-      {/*   <strong>时间：</strong> */}
-      {/*   {activity.date} */}
-      {/* </p> */}
-      {/* <p> */}
-      {/*   <strong>地点：</strong> */}
-      {/*   {activity.location} */}
-      {/* </p> */}
-      {/* <p>{activity.description}</p> */}
+      <h2>{activity.title}</h2>
+      <p>
+        <strong>地點：</strong>
+        {activity.arena_id}
+      </p>
+      <p>{activity.content}</p>
     </div>
   )
 }
