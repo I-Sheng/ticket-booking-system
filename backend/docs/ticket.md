@@ -63,9 +63,9 @@
 
 ##### Query Parameters
 
-> | key         | required | data type | description                       |
-> | ----------- | -------- | --------- | --------------------------------- |
-> | activity_id | true     | string    | UUID of the activity              |
+> | key         | required | data type | description                                          |
+> | ----------- | -------- | --------- | ---------------------------------------------------- |
+> | activity_id | true     | string    | UUID of the activity                                 |
 > | is_paid     | false    | string    | Filter tickets by payment status (`true` or `false`) |
 
 ##### Responses
@@ -105,7 +105,6 @@
 > | `500`     | `application/json` | `{"error": "Internal server error"}`                           |
 
 </details>
-
 
 ---
 
@@ -178,7 +177,7 @@
 
 > | key       | required | data type | description        |
 > | --------- | -------- | --------- | ------------------ |
-> | ticket_id | true     | string    | UUID of the ticket |
+> | region_id | true     | string    | UUID of the ticket |
 
 ##### Responses
 
