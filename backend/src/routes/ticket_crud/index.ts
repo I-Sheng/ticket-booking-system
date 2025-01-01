@@ -3,6 +3,7 @@ import { listTickets, listTicketsByActivity,listTicketsByRegion } from '../../da
 // import { deleteTicket } from '../../database/tickets/delete';
 import { createTicket} from '../../database/tickets/post';
 import { updateTicket } from '../../database/tickets/update';
+import { getRegionById } from '../../database/regions/get';
 import { jwtProtect,hostProtect } from '../middleware'
 
 const router = express.Router();
@@ -22,16 +23,46 @@ router.post('/create',jwtProtect, hostProtect, async (req, res) => {
   }
 });
 
-// List tickets for a user
-router.get('/list',jwtProtect, async (req, res) => {
+// // List tickets for a user
+// router.get('/list',jwtProtect, async (req, res) => {
+//   try {
+//     const user_id: string = req.body.decoded._id;
+//     const result = await listTickets(user_id as string);
+
+//     if ('error' in result) {
+//       return res.status(404).json({ error: result.error });
+//     }
+
+//     return res.status(200).json({ tickets: result });
+//   } catch (error) {
+//     console.error('Error in GET /tickets/list:', error);
+//     return res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// });
+
+
+// List tickets for a user with region names
+router.get('/list', jwtProtect, async (req, res) => {
   try {
     const user_id: string = req.body.decoded._id;
-    const result = await listTickets(user_id as string);
+    const tickets = await listTickets(user_id as string);
 
-    if ('error' in result) {
-      return res.status(404).json({ error: result.error });
+    if ('error' in tickets) {
+      return res.status(404).json({ error: tickets.error });
     }
-    return res.status(200).json({ tickets: result });
+
+    // Add region names to each ticket
+    const ticketsWithRegion = await Promise.all(
+      tickets.map(async (ticket) => {
+        const region = await getRegionById(ticket.region_id);
+        return {
+          ...ticket,
+          region_name: 'error' in region ? null : region.region_name, // Assuming region has a `name` field
+        };
+      })
+    );
+
+    return res.status(200).json({ tickets: ticketsWithRegion });
   } catch (error) {
     console.error('Error in GET /tickets/list:', error);
     return res.status(500).json({ error: 'Internal Server Error' });
