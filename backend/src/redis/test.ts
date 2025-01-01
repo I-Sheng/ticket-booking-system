@@ -17,6 +17,7 @@ describe("Index Functionality Tests", () => {
         activity_id: "activity1",
         region_id: "region1",
         seat_number: "3",
+        reserver_time: new Date(),
       };
 
       await createRedisTicket(ticket);
@@ -72,6 +73,7 @@ describe("Index Functionality Tests", () => {
         activity_id: "activity1",
         region_id,
         seat_number: "1",
+        reserver_time: new Date(),
       };
 
       await createRedisTicket(ticket);
