@@ -143,17 +143,17 @@ const UserSettings: React.FC = () => {
         </button>
       </form>
 
-      <div style={{ marginTop: '20px', textAlign: 'center' }}>
-        <a
-          href="/settings/change-password"
-          style={{
-            color: '#007BFF',
-            textDecoration: 'none',
-          }}
-        >
-          修改密碼
-        </a>
-      </div>
+      {/* <div style={{ marginTop: '20px', textAlign: 'center' }}> */}
+      {/*   <a */}
+      {/*     href="/settings/change-password" */}
+      {/*     style={{ */}
+      {/*       color: '#007BFF', */}
+      {/*       textDecoration: 'none', */}
+      {/*     }} */}
+      {/*   > */}
+      {/*     修改密碼 */}
+      {/*   </a> */}
+      {/* </div> */}
     </div>
   )
 }

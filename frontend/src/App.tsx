@@ -1,6 +1,12 @@
 // App.tsx
-import React from 'react'
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
+import React, { useState } from 'react'
+import {
+  useNavigate,
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Link,
+} from 'react-router-dom'
 import Home from './components/Home'
 import Register from './components/Registration'
 import Login from './components/Login'
@@ -35,17 +41,19 @@ const App: React.FC = () => {
                 borderRight: '1px solid #ccc',
               }}
             >
-              <Link style={{ padding: '30px' }} to="/">
+              <Link
+                style={{
+                  textDecoration: 'none',
+                  color: '#333',
+                  padding: '30px',
+                }}
+                to="/"
+                onMouseOver={(e) => (e.currentTarget.style.color = '#1E90FF')}
+                onMouseOut={(e) => (e.currentTarget.style.color = '#333')}
+              >
                 首頁
               </Link>
-              <Link style={{ padding: '30px' }} to="/myTicket">
-                我的票卷
-              </Link>
-              <Link style={{ padding: '30px' }} to="/settings">
-                使用者設定
-              </Link>
               <HostLink />
-              {/* <Link to="/schedule">報名</Link> */}
             </nav>
             <div
               style={{
@@ -85,19 +93,173 @@ const App: React.FC = () => {
 const LoginDisplay: React.FC = () => {
   const { isLoggedIn, name, logout } = useAuth()
 
+  const navigate = useNavigate()
+  const handleLogout = () => {
+    logout()
+    navigate('/')
+    window.location.reload()
+  }
+  const [showDropdown, setShowDropdown] = useState(false)
+  let closeTimeout: NodeJS.Timeout | null = null
+  const handleMouseEnter = () => {
+    if (closeTimeout) clearTimeout(closeTimeout)
+    setShowDropdown(true)
+  }
+  const handleMouseLeave = () => {
+    closeTimeout = setTimeout(() => {
+      setShowDropdown(false)
+    }, 200)
+  }
   return (
     <>
       {isLoggedIn ? (
         <>
-          <span style={{ marginRight: '10px' }}>歡迎, {name}!</span>
-          <button onClick={logout}>登出</button>
+          <div
+            style={{ position: 'relative', display: 'inline-block' }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            <button
+              style={{
+                backgroundColor: 'transparent',
+                border: '1px solid #ccc',
+                cursor: 'pointer',
+                padding: '10px',
+                fontSize: '16px',
+                width: '200px', // 設定固定寬度與下拉選單一致
+                textAlign: 'center',
+              }}
+            >
+              會員帳戶
+            </button>{' '}
+            {showDropdown && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '50px',
+                  left: 0,
+                  backgroundColor: '#fff',
+                  border: '1px solid #ccc',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                  zIndex: 10,
+                  minWidth: '200px',
+                }}
+                onMouseEnter={handleMouseEnter}
+              >
+                <ul
+                  style={{
+                    listStyle: 'none',
+                    padding: 0,
+                    margin: 0,
+                    justifyItems: 'center',
+                  }}
+                >
+                  <li
+                    style={{
+                      borderBottom: '1px solid #eee',
+                      padding: '10px',
+                      display: 'block', // 確保填滿父容器
+                      width: '100%',
+                    }}
+                  >
+                    <Link
+                      to="/settings"
+                      style={{
+                        textDecoration: 'none',
+                        textAlign: 'center',
+                        color: '#333',
+                        display: 'block', // 確保填滿父容器
+                        width: '100%',
+                      }}
+                      onMouseOver={(e) =>
+                        (e.currentTarget.style.color = '#1E90FF')
+                      }
+                      onMouseOut={(e) => (e.currentTarget.style.color = '#333')}
+                    >
+                      會員資料
+                    </Link>
+                  </li>
+                  <li
+                    style={{
+                      borderBottom: '1px solid #eee',
+                      padding: '10px',
+                      display: 'block', // 確保填滿父容器
+                      width: '100%',
+                    }}
+                  >
+                    <Link
+                      to="/myTicket"
+                      style={{
+                        textDecoration: 'none',
+                        textAlign: 'center',
+                        color: '#333',
+                        display: 'block', // 確保填滿父容器
+                        width: '100%',
+                      }}
+                      onMouseOver={(e) =>
+                        (e.currentTarget.style.color = '#1E90FF')
+                      }
+                      onMouseOut={(e) => (e.currentTarget.style.color = '#333')}
+                    >
+                      我的訂單
+                    </Link>
+                  </li>
+                  <li
+                    style={{
+                      borderBottom: '1px solid #eee',
+                      padding: '10px',
+                      display: 'block', // 確保填滿父容器
+                      width: '100%',
+                    }}
+                  >
+                    <button
+                      onClick={handleLogout}
+                      style={{
+                        backgroundColor: 'transparent',
+                        textDecoration: 'none',
+                        textAlign: 'center',
+                        color: '#333',
+                        display: 'block', // 確保填滿父容器
+                        fontSize: '16px',
+                        width: '100%',
+                        borderWidth: 0,
+                        cursor: 'pointer',
+                      }}
+                      onMouseOver={(e) =>
+                        (e.currentTarget.style.color = '#1E90FF')
+                      }
+                      onMouseOut={(e) => (e.currentTarget.style.color = '#333')}
+                    >
+                      登出
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
         </>
       ) : (
         <>
-          <Link to="/register" style={{ marginRight: '10px' }}>
+          <Link
+            to="/login"
+            style={{ textDecoration: 'none', color: '#333' }}
+            onMouseOver={(e) => (e.currentTarget.style.color = '#1E90FF')}
+            onMouseOut={(e) => (e.currentTarget.style.color = '#333')}
+          >
+            登入
+          </Link>
+          <Link
+            to="/register"
+            style={{
+              textDecoration: 'none',
+              color: '#333',
+              marginRight: '10px',
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.color = '#1E90FF')}
+            onMouseOut={(e) => (e.currentTarget.style.color = '#333')}
+          >
             註冊
           </Link>
-          <Link to="/login">登入</Link>
         </>
       )}
     </>
@@ -106,7 +268,12 @@ const LoginDisplay: React.FC = () => {
 const HostLink: React.FC = () => {
   const { role } = useAuth()
   return role === 'host' ? (
-    <Link to="/create-activity" style={{ padding: '30px' }}>
+    <Link
+      to="/create-activity"
+      style={{ textDecoration: 'none', color: '#333', padding: '30px' }}
+      onMouseOver={(e) => (e.currentTarget.style.color = '#1E90FF')}
+      onMouseOut={(e) => (e.currentTarget.style.color = '#333')}
+    >
       新增活動
     </Link>
   ) : null

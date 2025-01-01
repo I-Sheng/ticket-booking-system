@@ -35,7 +35,7 @@ const Login: React.FC = () => {
       const data = await response.json()
       if (data.jwtToken) {
         // 登录成功后，调用 login 保存状态和 token
-        login(data.email, data.username, data.jwtToken, data.role, data.phone)
+        login(data.email, data.username, data.jwtToken, data.role, data.phone_number)
         navigate('/') // 跳转到首页
       } else {
         alert('登录失败')
