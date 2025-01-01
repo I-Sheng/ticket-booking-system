@@ -10,6 +10,7 @@ import React, {
 interface AuthContextType {
   isLoggedIn: boolean
   name: string | null
+  jwtToken: string | null
   role: 'user' | 'host' | null
   login: (name: string, token: string, role: 'user' | 'host') => void
   logout: () => void
@@ -25,6 +26,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [name, setName] = useState<string | null>(null)
   const [role, setRole] = useState<'user' | 'host' | null>(null) // 'user' 或 'host'
+  const [jwtToken, setJwtToken] = useState<string | null>(null)
 
   useEffect(() => {
     // Load the token and name from localStorage when the component mounts
@@ -33,6 +35,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const savedRole = localStorage.getItem('role') as 'user' | 'host' | null // 强制转换为具体的 role 类型
 
     if (token) {
+      setJwtToken(token)
       setIsLoggedIn(true)
       setName(savedName)
       setRole(savedRole)
@@ -60,7 +63,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, name, role, login, logout }}>
+    <AuthContext.Provider
+      value={{ isLoggedIn, name, jwtToken, role, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   )
