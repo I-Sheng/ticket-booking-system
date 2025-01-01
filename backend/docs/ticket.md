@@ -40,12 +40,6 @@
 > | ------------- | -------------- | ------------- |
 > | Authorization | `Bearer token` | The JWT token |
 
-##### Query Parameters
-
-> | key     | required | data type | description      |
-> | ------- | -------- | --------- | ---------------- |
-> | user_id | true     | string    | UUID of the user |
-
 ##### Responses
 
 > | http code | content-type       | response                                              |

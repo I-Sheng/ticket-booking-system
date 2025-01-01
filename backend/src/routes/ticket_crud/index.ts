@@ -25,7 +25,7 @@ router.post('/create',jwtProtect, hostProtect, async (req, res) => {
 // List tickets for a user
 router.get('/list',jwtProtect, async (req, res) => {
   try {
-    const { user_id } = req.query;
+    const user_id: string = req.body.decoded._id;
     const result = await listTickets(user_id as string);
 
     if ('error' in result) {
