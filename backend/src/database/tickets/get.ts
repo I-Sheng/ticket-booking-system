@@ -1,4 +1,4 @@
-import { query } from '../database';
+import { query } from "../database";
 
 export async function listTickets(user_id: string) {
   const qstring = `
@@ -7,30 +7,15 @@ export async function listTickets(user_id: string) {
   try {
     const result = await query(qstring, [user_id]);
     if (result.rowCount === 0) {
-      return { error: 'No tickets found for this user' };
+      return { error: "No tickets found for this user" };
     }
     return result.rows;
   } catch (error) {
-    console.error('Error listing tickets:', error);
-    return { error: 'Failed to fetch tickets' };
+    console.error("Error listing tickets:", error);
+    return { error: "Failed to fetch tickets" };
   }
 }
 
-// export async function getTicketById(ticket_id: string, user_id: string) {
-//   const qstring = `
-//     SELECT * FROM tickets WHERE _id = $1 AND user_id = $2;
-//   `;
-//   try {
-//     const result = await query(qstring, [ticket_id, user_id]);
-//     if (result.rowCount === 0) {
-//       return { error: 'Ticket not found for this user' };
-//     }
-//     return result.rows[0]; // Return single ticket
-//   } catch (error) {
-//     console.error('Error fetching ticket by ID:', error);
-//     return { error: 'Failed to fetch ticket' };
-//   }
-// }
 export async function getTicketById(ticket_id: string, user_id: string) {
   const qstring = `
     SELECT * FROM tickets WHERE _id = $1 AND user_id = $2;
@@ -62,16 +47,19 @@ export async function listTicketsByActivity(activity_id: string, is_paid?: strin
   try {
     const result = await query(qstring, params);
     if (result.rowCount === 0) {
-      return { error: 'No tickets found for this activity' };
+      return { error: "No tickets found for this activity" };
     }
     return result.rows;
   } catch (error) {
-    console.error('Error listing tickets by activity:', error);
-    return { error: 'Failed to fetch tickets' };
+    console.error("Error listing tickets by activity:", error);
+    return { error: "Failed to fetch tickets" };
   }
 }
 
-export async function listTicketsByRegion(region_id: string, is_paid?: boolean) {
+export async function listTicketsByRegion(
+  region_id: string,
+  is_paid?: boolean
+) {
   // Base query string
   let qstring = `SELECT * FROM tickets WHERE region_id = $1`;
   const params: (string | boolean)[] = [region_id];
@@ -84,13 +72,9 @@ export async function listTicketsByRegion(region_id: string, is_paid?: boolean) 
 
   try {
     const result = await query(qstring, params);
-    if (result.rowCount === 0) {
-      return { error: 'No tickets found for this activity and region' };
-    }
     return result.rows;
   } catch (error) {
-    console.error('Error listing tickets by activity and region:', error);
-    return { error: 'Failed to fetch tickets' };
+    console.error("Error listing tickets by activity and region:", error);
+    return { error: "Failed to fetch tickets" };
   }
 }
-
