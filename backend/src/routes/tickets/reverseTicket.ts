@@ -1,5 +1,6 @@
 import { Redis } from "ioredis";
 import Redlock from "redlock";
+import { updateRedisTicket } from "../../redis/index"; // Adjust the path if necessary
 
 // Initialize Redis client
 const redis = new Redis();
@@ -37,11 +38,12 @@ async function bookSeat(
         };
       }
 
-      // Book the seat by setting its status to "booked"
-      await redis.set(`seat:${ticketId}:${seatId}`, "booked");
-
-      // Simulate post-booking operations (e.g., save to database)
-      await performPostBookingOperations(userId, ticketId, seatId);
+      // Update the ticket status using updateRedisTicket
+      await updateRedisTicket(ticketId, {
+        user_id: userId,
+        status: "booked",
+        seat_number: seatId,
+      });
 
       return {
         success: true,
@@ -59,44 +61,3 @@ async function bookSeat(
     };
   }
 }
-
-async function performPostBookingOperations(
-  userId: string,
-  ticketId: string,
-  seatId: string
-): Promise<void> {
-  // Simulate saving booking details to the database or additional processing
-  console.log(
-    `Saving booking details for user ${userId}, ticket ${ticketId}, seat ${seatId}`
-  );
-  await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate delay
-}
-
-//example
-(async () => {
-  const ticketId = "concert123";
-  const seatId1 = "A1";
-  const seatId2 = "A2";
-  const user1 = "user1";
-  const user2 = "user2";
-
-  // Ensure Redis is ready
-  await redis.ping();
-
-  // Initialize seat statuses sequentially
-  await redis.set(`seat:${ticketId}:${seatId1}`, "available");
-  await redis.set(`seat:${ticketId}:${seatId2}`, "available");
-
-  // Simulate concurrent bookings
-  const booking1 = bookSeat(user1, ticketId, seatId1);
-  const booking2 = bookSeat(user2, ticketId, seatId2);
-
-  // Wait for both bookings to complete
-  const results = await Promise.all([booking1, booking2]);
-
-  // Log results
-  results.forEach((result) => console.log(result.message));
-
-  // Cleanup: Close Redis connection
-  redis.disconnect();
-})();
