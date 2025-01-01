@@ -140,7 +140,7 @@ router.post(
             activity_id: result.activity._id,
             region_id: region._id,
             seat_number: String(seatNumber),
-            reserver_time: new Date(),
+            reserver_time: new Date().toString(),
           });
 
           if ("error" in ticket) {

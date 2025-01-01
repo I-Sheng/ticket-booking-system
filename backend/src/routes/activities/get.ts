@@ -50,6 +50,19 @@ router.get('/:activity_id', async (req, res) => {
       return res.status(404).json({ error: 'Activity not found' })
     }
 
+    // Process images to convert binary data into Base64
+    const activitiesWithImages = {
+      ...activity,
+      cover_img: activity.cover_img
+        ? `data:image/jpeg;base64,${activity.cover_img.toString('base64')}`
+        : null,
+      price_level_img: activity.price_level_img
+        ? `data:image/jpeg;base64,${activity.price_level_img.toString(
+            'base64'
+          )}`
+        : null,
+    }
+
     // Fetch regions for the activity
     const regions = await listRegions(activity_id)
 
@@ -61,7 +74,7 @@ router.get('/:activity_id', async (req, res) => {
     return res.status(200).json({
       message: 'Activity and regions retrieved successfully',
       activity: {
-        ...activity,
+        ...activitiesWithImages,
         regions: regions, // Add regions to the activity response
       },
     })
