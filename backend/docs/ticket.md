@@ -63,9 +63,9 @@
 
 ##### Query Parameters
 
-> | key         | required | data type | description                       |
-> | ----------- | -------- | --------- | --------------------------------- |
-> | activity_id | true     | string    | UUID of the activity              |
+> | key         | required | data type | description                                          |
+> | ----------- | -------- | --------- | ---------------------------------------------------- |
+> | activity_id | true     | string    | UUID of the activity                                 |
 > | is_paid     | false    | string    | Filter tickets by payment status (`true` or `false`) |
 
 ##### Responses
@@ -91,22 +91,21 @@
 
 ##### Query Parameters
 
-> | key         | required | data type | description                       |
-> | ----------- | -------- | --------- | --------------------------------- |
-> | activity_id | true     | string    | UUID of the activity              |
-> | region_id   | true     | string    | UUID of the region                |
+> | key         | required | data type | description                                          |
+> | ----------- | -------- | --------- | ---------------------------------------------------- |
+> | activity_id | true     | string    | UUID of the activity                                 |
+> | region_id   | true     | string    | UUID of the region                                   |
 > | is_paid     | false    | string    | Filter tickets by payment status (`true` or `false`) |
 
 ##### Responses
 
-> | http code | content-type       | response                                                       |
-> | --------- | ------------------ | ------------------------------------------------------------- |
-> | `200`     | `application/json` | `{"tickets": [ ... ]}`                                         |
+> | http code | content-type       | response                                                         |
+> | --------- | ------------------ | ---------------------------------------------------------------- |
+> | `200`     | `application/json` | `{"tickets": [ ... ]}`                                           |
 > | `404`     | `application/json` | `{"error": "Activity and region not found or no tickets found"}` |
-> | `500`     | `application/json` | `{"error": "Internal server error"}`                           |
+> | `500`     | `application/json` | `{"error": "Internal server error"}`                             |
 
 </details>
-
 
 ---
 
@@ -179,7 +178,7 @@
 
 > | key       | required | data type | description        |
 > | --------- | -------- | --------- | ------------------ |
-> | ticket_id | true     | string    | UUID of the ticket |
+> | region_id | true     | string    | UUID of the ticket |
 
 ##### Responses
 
