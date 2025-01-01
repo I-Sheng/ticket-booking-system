@@ -91,18 +91,18 @@
 
 ##### Query Parameters
 
-> | key         | required | data type | description                       |
-> | ----------- | -------- | --------- | --------------------------------- |
-> | region_id   | true     | string    | UUID of the region                |
+> | key         | required | data type | description                                          |
+> | ----------- | -------- | --------- | ---------------------------------------------------- |
+> | region_id   | true     | string    | UUID of the region                                   |
 > | is_paid     | false    | string    | Filter tickets by payment status (`true` or `false`) |
 
 ##### Responses
 
-> | http code | content-type       | response                                                       |
-> | --------- | ------------------ | ------------------------------------------------------------- |
-> | `200`     | `application/json` | `{"tickets": [ ... ]}`                                         |
-> | `404`     | `application/json` | `{"error": "region not found or no tickets found"}` |
-> | `500`     | `application/json` | `{"error": "Internal server error"}`                           |
+> | http code | content-type       | response                                                         |
+> | --------- | ------------------ | ---------------------------------------------------------------- |
+> | `200`     | `application/json` | `{"tickets": [ ... ]}`                                           |
+> | `404`     | `application/json` | `{"error": "Activity and region not found or no tickets found"}` |
+> | `500`     | `application/json` | `{"error": "Internal server error"}`                             |
 
 </details>
 
