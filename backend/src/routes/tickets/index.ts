@@ -2,7 +2,7 @@ import Redis from "ioredis";
 import Redlock from "redlock";
 import express from "express";
 import { jwtProtect } from "../middleware";
-import { updateRedisTicket, Ticket } from "../../redis/index";
+import { updateRedisTicket } from "../../redis/index";
 import "dotenv/config";
 
 const POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD as string;
@@ -17,29 +17,30 @@ const router = express.Router();
 const TICKET_KEY_PREFIX = "ticket:";
 
 router.post("/reserveTicket", jwtProtect, async (req, res) => {
-  console.log("enter reserver");
   const { ticket_id } = req.body;
   const user_id: string = req.body.decoded._id;
-  console.log("ticket_id", ticket_id);
-  console.log("user_id", user_id);
 
   if (!ticket_id || !user_id) {
     return res.status(400).json({ error: "Missing ticket_id or user_id" });
   }
 
   const ticketKey = `${TICKET_KEY_PREFIX}${ticket_id}`;
+  const lockKey = `lock:${ticketKey}`;
+  const lockTTL = 5000; // Lock expiration time in milliseconds
 
   try {
-    await redlock.using([ticketKey], 50000, async () => {
-      console.log(ticketKey);
+    // Acquire the lock
+    const lock = await redlock.acquire([lockKey], lockTTL);
+
+    try {
+      // Check the ticket's status in Redis
       const ticket = await redis.hgetall(ticketKey);
-      console.log("ticket", ticket);
 
       if (ticket.status !== "empty") {
         throw new Error("Ticket is not available for reservation");
       }
 
-      console.log("after checking empty");
+      // Reserve the ticket
       await updateRedisTicket(ticket_id, {
         status: "reserved",
         user_id,
@@ -47,8 +48,14 @@ router.post("/reserveTicket", jwtProtect, async (req, res) => {
       });
 
       res.json({ message: "Ticket reserved successfully" });
-    });
+    } finally {
+      // Release the lock
+      await lock.release();
+    }
   } catch (error: any) {
+    if (error) {
+      return res.status(423).json({ error: "Resource is already locked" });
+    }
     res.status(500).json({ error: error.message });
   }
 });
@@ -72,7 +79,7 @@ router.post("/buyTicket", async (req, res) => {
       }
 
       await updateRedisTicket(ticket_id, {
-        status: "sold",
+        status: "paid",
       });
 
       res.json({ message: "Ticket purchased successfully" });
