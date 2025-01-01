@@ -39,15 +39,15 @@ export async function listTicketsByActivity(activity_id: string, is_paid?: strin
   }
 }
 
-export async function listTicketsByActivityAndRegion(activity_id: string, region_id: string, is_paid?: string) {
+export async function listTicketsByRegion(region_id: string, is_paid?: boolean) {
   // Base query string
-  let qstring = `SELECT * FROM tickets WHERE activity_id = $1 AND region_id = $2`;
-  const params: (string | boolean)[] = [activity_id, region_id];
+  let qstring = `SELECT * FROM tickets WHERE region_id = $1`;
+  const params: (string | boolean)[] = [region_id];
 
   // Add filter for is_paid if provided
   if (is_paid !== undefined) {
-    qstring += ` AND is_paid = $3`;
-    params.push(is_paid === "true"); // Convert string to boolean
+    qstring += ` AND is_paid = $2`;
+    params.push(is_paid === true); // Convert string to boolean
   }
 
   try {
