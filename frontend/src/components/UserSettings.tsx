@@ -30,9 +30,9 @@ const UserSettings: React.FC = () => {
       // 更新 AuthContext 的 name
       login(currentName, token, role)
 
-      alert('用户信息已更新')
+      alert('更新成功')
     } else {
-      alert('更新失败：用户未登录或信息不完整')
+      alert('失败')
     }
   }
 
@@ -48,12 +48,12 @@ const UserSettings: React.FC = () => {
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
       }}
     >
-      <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>用户设置</h2>
+      <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>使用者設定</h2>
       <form onSubmit={handleSaveChanges}>
         {/* 电子邮箱 */}
         <div style={{ marginBottom: '15px' }}>
           <label style={{ display: 'block', marginBottom: '5px' }}>
-            电子邮箱
+            電子郵件
           </label>
           <input
             type="email"
@@ -89,7 +89,7 @@ const UserSettings: React.FC = () => {
         {/* 手机号码 */}
         <div style={{ marginBottom: '15px' }}>
           <label style={{ display: 'block', marginBottom: '5px' }}>
-            手机号码
+            手機號碼
           </label>
           <input
             type="text"
@@ -116,7 +116,7 @@ const UserSettings: React.FC = () => {
             fontSize: '16px',
           }}
         >
-          保存更改
+          儲存
         </button>
       </form>
 
@@ -128,7 +128,7 @@ const UserSettings: React.FC = () => {
             textDecoration: 'none',
           }}
         >
-          修改密码
+          修改密碼
         </a>
       </div>
     </div>
