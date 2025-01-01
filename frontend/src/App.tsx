@@ -17,6 +17,7 @@ import MyTicket from './components/myTicket' // 引入MyTicket组件
 import UserSettings from './components/UserSettings'
 import ChangePassword from './components/ChangePassword'
 import BuyTicketPage from './components/BuyTicketPage'
+import PaymentPage from './components/PaymentPage'
 
 const App: React.FC = () => {
   return (
@@ -81,6 +82,7 @@ const App: React.FC = () => {
                 element={<ChangePassword />}
               />
               <Route path="/buy-ticket/:id" element={<BuyTicketPage />} />
+              <Route path="/payment/:id" element={<PaymentPage />} />
             </Routes>
           </div>
         </div>
