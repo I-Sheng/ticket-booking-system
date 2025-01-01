@@ -122,8 +122,10 @@ router.post("/buyTicket", jwtProtect, async (req, res) => {
         throw new Error("Ticket is not available for purchase");
       }
 
+      const time: Date = new Date();
       await updateRedisTicket(ticket_id, {
         status: "paid",
+        reserver_time: time.toString(),
       });
 
       await updateTicket({
@@ -131,6 +133,7 @@ router.post("/buyTicket", jwtProtect, async (req, res) => {
         user_id: user_id,
         is_paid: true,
         seat_number: Number(ticket.seat_number),
+        created_at: time,
       });
 
       res.status(200).json({ message: "Ticket purchased successfully" });
@@ -170,7 +173,7 @@ router.post("/refundTicket", jwtProtect, async (req, res) => {
 
       await updateTicket({
         ticket_id: ticket_id,
-        user_id: undefined,
+        user_id: null,
         is_paid: false,
       });
 
