@@ -18,6 +18,8 @@ import UserSettings from './components/UserSettings'
 import ChangePassword from './components/ChangePassword'
 import BuyTicketPage from './components/BuyTicketPage'
 import PaymentPage from './components/PaymentPage'
+import ManageActivities from './components/manageActivities'
+import EditActivity from './components/editActivity'
 
 const App: React.FC = () => {
   return (
@@ -74,7 +76,9 @@ const App: React.FC = () => {
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
               <Route path="/Activity/:id" element={<Activity />}></Route>
+              <Route path="/editActivity/:id" element={<EditActivity />}></Route>
               <Route path="/create-activity" element={<CreateActivity />} />
+              <Route path="/manage-activity" element={<ManageActivities />} />
               <Route path="/myTicket" element={<MyTicket />} />
               <Route path="/settings" element={<UserSettings />} />
               <Route
@@ -270,14 +274,25 @@ const LoginDisplay: React.FC = () => {
 const HostLink: React.FC = () => {
   const { role } = useAuth()
   return role === 'host' ? (
-    <Link
-      to="/create-activity"
-      style={{ textDecoration: 'none', color: '#333', padding: '30px' }}
-      onMouseOver={(e) => (e.currentTarget.style.color = '#1E90FF')}
-      onMouseOut={(e) => (e.currentTarget.style.color = '#333')}
-    >
-      新增活動
-    </Link>
+    <>
+      {' '}
+      <Link
+        to="/create-activity"
+        style={{ textDecoration: 'none', color: '#333', padding: '30px' }}
+        onMouseOver={(e) => (e.currentTarget.style.color = '#1E90FF')}
+        onMouseOut={(e) => (e.currentTarget.style.color = '#333')}
+      >
+        新增活動
+      </Link>
+      <Link
+        to="/manage-activity"
+        style={{ textDecoration: 'none', color: '#333', padding: '30px' }}
+        onMouseOver={(e) => (e.currentTarget.style.color = '#1E90FF')}
+        onMouseOut={(e) => (e.currentTarget.style.color = '#333')}
+      >
+        管理活動
+      </Link>
+    </>
   ) : null
 }
 
