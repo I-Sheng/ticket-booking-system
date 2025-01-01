@@ -1,14 +1,12 @@
 import express from 'express'
 import createRouter from './create'
-import getRouter from './get'
 import updateRouter from './update'
-import regionsRouter from './regions'
+import deleteRouter from './delete'
 
 const router = express.Router()
 
 router.use('/', createRouter)
-router.use('/', getRouter)
 router.use('/', updateRouter)
-router.use('/regions', regionsRouter)
+router.use('/', deleteRouter)
 
 export default router

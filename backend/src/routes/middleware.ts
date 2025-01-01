@@ -4,6 +4,7 @@ import { env } from '../constants'
 import { ErrorRequestHandler } from 'express'
 
 export type DecodedType = {
+  _id: string,
   email: string
   role: string
   iat: number
@@ -27,10 +28,11 @@ export function jwtProtect(
   jwt.verify(token, env.JWT_SECRET as string, (err, user) => {
     if (!err) {
       req.body.decoded = user as DecodedType
+      console.log(user)
       return next()
     }
     if (err.name === 'TokenExpiredError') {
-      return res.send(401).send('Token expired')
+      return res.status(401).send('Token expired')
     }
     if (err) {
       return res.status(403).send('Invalid token')

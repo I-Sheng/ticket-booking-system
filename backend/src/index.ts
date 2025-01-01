@@ -1,6 +1,11 @@
 import express from 'express'
 import cors from 'cors'
-import { arenaRouter,ticketRouter,activitiesRouter,regionsRouter,authRouter } from './routes'
+import {
+  arenaRouter,
+  ticketRouter,
+  activitiesRouter,
+  authRouter,
+} from './routes'
 
 const app = express()
 app.use(cors())
@@ -15,7 +20,6 @@ app.get('/', (_req, res) => {
 
 app.use('/arenas', arenaRouter)
 app.use('/tickets', ticketRouter)
-app.use('/regions', regionsRouter)
 app.use('/activities', activitiesRouter)
 app.use('/auth', authRouter)
 
