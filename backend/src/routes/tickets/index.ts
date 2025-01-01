@@ -1,6 +1,7 @@
 import Redis from "ioredis";
 import Redlock from "redlock";
 import express from "express";
+import { jwtProtect } from "../middleware";
 import { updateRedisTicket, Ticket } from "../../redis/index";
 import "dotenv/config";
 
@@ -15,8 +16,12 @@ const redlock = new Redlock([redis], {
 const router = express.Router();
 const TICKET_KEY_PREFIX = "ticket:";
 
-router.post("/reserveTicket", async (req, res) => {
-  const { ticket_id, user_id } = req.body;
+router.post("/reserveTicket", jwtProtect, async (req, res) => {
+  console.log("enter reserver");
+  const { ticket_id } = req.body;
+  const user_id: string = req.body.decoded._id;
+  console.log("ticket_id", ticket_id);
+  console.log("user_id", user_id);
 
   if (!ticket_id || !user_id) {
     return res.status(400).json({ error: "Missing ticket_id or user_id" });
@@ -25,13 +30,16 @@ router.post("/reserveTicket", async (req, res) => {
   const ticketKey = `${TICKET_KEY_PREFIX}${ticket_id}`;
 
   try {
-    await redlock.using([ticketKey], 5000, async () => {
+    await redlock.using([ticketKey], 50000, async () => {
+      console.log(ticketKey);
       const ticket = await redis.hgetall(ticketKey);
+      console.log("ticket", ticket);
 
       if (ticket.status !== "empty") {
         throw new Error("Ticket is not available for reservation");
       }
 
+      console.log("after checking empty");
       await updateRedisTicket(ticket_id, {
         status: "reserved",
         user_id,
@@ -46,7 +54,8 @@ router.post("/reserveTicket", async (req, res) => {
 });
 
 router.post("/buyTicket", async (req, res) => {
-  const { ticket_id, user_id } = req.body;
+  const { ticket_id } = req.body;
+  const user_id: string = req.body.decoded._id;
 
   if (!ticket_id || !user_id) {
     return res.status(400).json({ error: "Missing ticket_id or user_id" });
@@ -74,7 +83,8 @@ router.post("/buyTicket", async (req, res) => {
 });
 
 router.post("/refundTicket", async (req, res) => {
-  const { ticket_id, user_id } = req.body;
+  const { ticket_id } = req.body;
+  const user_id: string = req.body.decoded._id;
 
   if (!ticket_id || !user_id) {
     return res.status(400).json({ error: "Missing ticket_id or user_id" });

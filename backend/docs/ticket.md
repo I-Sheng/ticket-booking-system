@@ -146,16 +146,15 @@
 
 ##### Headers
 
-> | key          | value              | description                |
-> | ------------ | ------------------ | -------------------------- |
-> | Content-Type | `application/json` | Specifies the content type |
+> | key           | value          | description   |
+> | ------------- | -------------- | ------------- |
+> | Authorization | `Bearer token` | The JWT token |
 
 ##### Body (application/json)
 
 > | key       | required | data type | description        |
 > | --------- | -------- | --------- | ------------------ |
 > | ticket_id | true     | string    | UUID of the ticket |
-> | user_id   | true     | string    | UUID of the user   |
 
 ##### Responses
 
@@ -174,16 +173,15 @@
 
 ##### Headers
 
-> | key          | value              | description                |
-> | ------------ | ------------------ | -------------------------- |
-> | Content-Type | `application/json` | Specifies the content type |
+> | key           | value          | description   |
+> | ------------- | -------------- | ------------- |
+> | Authorization | `Bearer token` | The JWT token |
 
 ##### Body (application/json)
 
 > | key       | required | data type | description        |
 > | --------- | -------- | --------- | ------------------ |
 > | ticket_id | true     | string    | UUID of the ticket |
-> | user_id   | true     | string    | UUID of the user   |
 
 ##### Responses
 
@@ -202,16 +200,15 @@
 
 ##### Headers
 
-> | key          | value              | description                |
-> | ------------ | ------------------ | -------------------------- |
-> | Content-Type | `application/json` | Specifies the content type |
+> | key           | value          | description   |
+> | ------------- | -------------- | ------------- |
+> | Authorization | `Bearer token` | The JWT token |
 
 ##### Body (application/json)
 
 > | key       | required | data type | description        |
 > | --------- | -------- | --------- | ------------------ |
 > | ticket_id | true     | string    | UUID of the ticket |
-> | user_id   | true     | string    | UUID of the user   |
 
 ##### Responses
 
