@@ -40,12 +40,6 @@
 > | ------------- | -------------- | ------------- |
 > | Authorization | `Bearer token` | The JWT token |
 
-##### Query Parameters
-
-> | key     | required | data type | description      |
-> | ------- | -------- | --------- | ---------------- |
-> | user_id | true     | string    | UUID of the user |
-
 ##### Responses
 
 > | http code | content-type       | response                                              |
@@ -59,7 +53,7 @@
 ---
 
 <details>
-<summary><code>GET</code> <code><b>/list-by-activity</b></code> <code>(List all tickets for an activity)</code></summary>
+<summary><code>GET</code> <code><b>/list-by-activity</b></code> <code>(List all tickets for an activity, with optional filter for is_paid)</code></summary>
 
 ##### Headers
 
@@ -69,9 +63,10 @@
 
 ##### Query Parameters
 
-> | key         | required | data type | description          |
-> | ----------- | -------- | --------- | -------------------- |
-> | activity_id | true     | string    | UUID of the activity |
+> | key         | required | data type | description                       |
+> | ----------- | -------- | --------- | --------------------------------- |
+> | activity_id | true     | string    | UUID of the activity              |
+> | is_paid     | false    | string    | Filter tickets by payment status (`true` or `false`) |
 
 ##### Responses
 
@@ -82,6 +77,36 @@
 > | `500`     | `application/json` | `{"error": "Internal server error"}`                  |
 
 </details>
+
+---
+
+<details>
+<summary><code>GET</code> <code><b>/list-by-activity-and-region</b></code> <code>(List all tickets for an activity and region, with optional filter for is_paid)</code></summary>
+
+##### Headers
+
+> | key           | value          | description   |
+> | ------------- | -------------- | ------------- |
+> | Authorization | `Bearer token` | The JWT token |
+
+##### Query Parameters
+
+> | key         | required | data type | description                       |
+> | ----------- | -------- | --------- | --------------------------------- |
+> | activity_id | true     | string    | UUID of the activity              |
+> | region_id   | true     | string    | UUID of the region                |
+> | is_paid     | false    | string    | Filter tickets by payment status (`true` or `false`) |
+
+##### Responses
+
+> | http code | content-type       | response                                                       |
+> | --------- | ------------------ | ------------------------------------------------------------- |
+> | `200`     | `application/json` | `{"tickets": [ ... ]}`                                         |
+> | `404`     | `application/json` | `{"error": "Activity and region not found or no tickets found"}` |
+> | `500`     | `application/json` | `{"error": "Internal server error"}`                           |
+
+</details>
+
 
 ---
 
@@ -142,143 +167,80 @@
 ---
 
 <details>
-<summary><code>POST</code> <code><b>/reserve</b></code> <code>(Reserve a ticket)</code></summary>
+<summary><code>POST</code> <code><b>/reserveTicket</b></code> <code>(Reserve a ticket)</code></summary>
 
 ##### Headers
 
-> | key          | value              | description                |
-> | ------------ | ------------------ | -------------------------- |
-> | Content-Type | `application/json` | Specifies the content type |
+> | key           | value          | description   |
+> | ------------- | -------------- | ------------- |
+> | Authorization | `Bearer token` | The JWT token |
 
 ##### Body (application/json)
 
-> | key           | required | data type | description                            |
-> | ------------- | -------- | --------- | -------------------------------------- |
-> | userId        | true     | string    | UUID of the user                       |
-> | reservationId | true     | string    | UUID of the event                      |
-> | seatId        | true     | string    | UUID of region + seat_number in ticket |
+> | key       | required | data type | description        |
+> | --------- | -------- | --------- | ------------------ |
+> | ticket_id | true     | string    | UUID of the ticket |
 
 ##### Responses
 
-> | http code | content-type       | response                                                  |
-> | --------- | ------------------ | --------------------------------------------------------- |
-> | `200`     | `application/json` | `{"success": true, "reservationId": "...", ...}`          |
-> | `206`     | `application/json` | `{"success": false, "message": "Seat already occupied" }` |
-> | `400`     | `application/json` | `{"success": false, "message": "Invalid parameters"}`     |
-> | `500`     | `application/json` | `{"success": false, "message": "Internal server error"}`  |
+> | http code | content-type       | response                                      |
+> | --------- | ------------------ | --------------------------------------------- |
+> | `200`     | `application/json` | `{"message": "Ticket reserved successfully"}` |
+> | `400`     | `application/json` | `{"error": "Missing ticket_id or user_id"}`   |
+> | `500`     | `application/json` | `{"error": "Internal server error"}`          |
 
 </details>
 
 ---
 
 <details>
-<summary><code>POST</code> <code><b>/multi-reserve</b></code> <code>(Reserve a ticket)</code></summary>
+<summary><code>POST</code> <code><b>/buyTicket</b></code> <code>(Buy a reserved ticket)</code></summary>
 
 ##### Headers
 
-> | key          | value              | description                |
-> | ------------ | ------------------ | -------------------------- |
-> | Content-Type | `application/json` | Specifies the content type |
+> | key           | value          | description   |
+> | ------------- | -------------- | ------------- |
+> | Authorization | `Bearer token` | The JWT token |
 
 ##### Body (application/json)
 
-> | key           | required | data type | description                  |
-> | ------------- | -------- | --------- | ---------------------------- |
-> | userId        | true     | string    | UUID of the user             |
-> | reservationId | true     | string    | UUID of the event            |
-> | quantity      | true     | number    | Number of tickets to reserve |
+> | key       | required | data type | description        |
+> | --------- | -------- | --------- | ------------------ |
+> | ticket_id | true     | string    | UUID of the ticket |
 
 ##### Responses
 
-> | http code | content-type       | response                                                  |
-> | --------- | ------------------ | --------------------------------------------------------- |
-> | `200`     | `application/json` | `{"success": true, "reservationId": "...", ...}`          |
-> | `206`     | `application/json` | `{"success": false, "message": "Seat already occupied" }` |
-> | `400`     | `application/json` | `{"success": false, "message": "Invalid parameters"}`     |
-> | `500`     | `application/json` | `{"success": false, "message": "Internal server error"}`  |
+> | http code | content-type       | response                                       |
+> | --------- | ------------------ | ---------------------------------------------- |
+> | `200`     | `application/json` | `{"message": "Ticket purchased successfully"}` |
+> | `400`     | `application/json` | `{"error": "Missing ticket_id or user_id"}`    |
+> | `500`     | `application/json` | `{"error": "Internal server error"}`           |
 
 </details>
 
 ---
 
 <details>
-<summary><code>POST</code> <code><b>/buy</b></code> <code>(Buy a reserved ticket)</code></summary>
+<summary><code>POST</code> <code><b>/refundTicket</b></code> <code>(Refund a ticket)</code></summary>
 
 ##### Headers
 
-> | key          | value              | description                |
-> | ------------ | ------------------ | -------------------------- |
-> | Content-Type | `application/json` | Specifies the content type |
+> | key           | value          | description   |
+> | ------------- | -------------- | ------------- |
+> | Authorization | `Bearer token` | The JWT token |
 
 ##### Body (application/json)
 
-> | key            | required | data type | description                    |
-> | -------------- | -------- | --------- | ------------------------------ |
-> | reservationId  | true     | string    | UUID of the ticket reservation |
-> | paymentDetails | true     | object    | Payment method and details     |
+> | key       | required | data type | description        |
+> | --------- | -------- | --------- | ------------------ |
+> | ticket_id | true     | string    | UUID of the ticket |
 
 ##### Responses
 
-> | http code | content-type       | response                                                 |
-> | --------- | ------------------ | -------------------------------------------------------- |
-> | `200`     | `application/json` | `{"success": true, "ticketId": "...", ...}`              |
-> | `400`     | `application/json` | `{"success": false, "message": "Invalid data"}`          |
-> | `500`     | `application/json` | `{"success": false, "message": "Internal server error"}` |
+> | http code | content-type       | response                                      |
+> | --------- | ------------------ | --------------------------------------------- |
+> | `200`     | `application/json` | `{"message": "Ticket refunded successfully"}` |
+> | `400`     | `application/json` | `{"error": "Missing ticket_id or user_id"}`   |
+> | `500`     | `application/json` | `{"error": "Internal server error"}`          |
 
 </details>
-
----
-
-<details>
-<summary><code>DELETE</code> <code><b>/tickets/:ticketId</b></code> <code>(Delete a ticket)</code></summary>
-
-##### Headers
-
-> | key           | value            | description            |
-> | ------------- | ---------------- | ---------------------- |
-> | Authorization | `Bearer <token>` | The JWT token for auth |
-
-##### Params
-
-> | key      | required | data type | description                  |
-> | -------- | -------- | --------- | ---------------------------- |
-> | ticketId | true     | string    | UUID of the ticket to delete |
-
-##### Responses
-
-> | http code | content-type       | response                                                 |
-> | --------- | ------------------ | -------------------------------------------------------- |
-> | `200`     | `application/json` | `{"success": true, "message": "Deleted successfully"}`   |
-> | `404`     | `application/json` | `{"success": false, "message": "Ticket not found"}`      |
-> | `500`     | `application/json` | `{"success": false, "message": "Internal server error"}` |
-
-</details>
-
----
-
-<details>
-<summary><code>GET</code> <code><b>/availability/:eventId</b></code> <code>(Check ticket availability)</code></summary>
-
-##### Headers
-
-> | key           | value            | description            |
-> | ------------- | ---------------- | ---------------------- |
-> | Authorization | `Bearer <token>` | The JWT token for auth |
-
-##### Params
-
-> | key     | required | data type | description       |
-> | ------- | -------- | --------- | ----------------- |
-> | eventId | true     | string    | UUID of the event |
-
-##### Responses
-
-> | http code | content-type       | response                                                 |
-> | --------- | ------------------ | -------------------------------------------------------- |
-> | `200`     | `application/json` | `{"success": true, "ticketsLeft": ...}`                  |
-> | `404`     | `application/json` | `{"success": false, "message": "Event not found"}`       |
-> | `500`     | `application/json` | `{"success": false, "message": "Internal server error"}` |
-
-</details>
-
----
