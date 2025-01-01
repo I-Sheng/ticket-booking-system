@@ -13,6 +13,12 @@ export function encryptPassword(plainText: string) {
   return bcrypt.hashSync(plainText, 10)
 }
 
-export function generateJWT(email: string, role: string) {
-  return 'Bearer ' + jwt.sign({ email, role }, env.JWT_SECRET)
+export function generateJWT(_id: string, email: string, role: string) {
+  const payload = {
+    _id, // Include user_id in the payload
+    email,
+    role,
+  }
+  const token = jwt.sign(payload, env.JWT_SECRET)
+  return 'Bearer ' + token
 }
