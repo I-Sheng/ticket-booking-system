@@ -63,6 +63,7 @@ router.post('/login', async (req, res) => {
   return res.status(200).json({
     email: user.email,
     username: user.username,
+    phone_number: user.phone_number,
     role: user.role,
     jwtToken,
   })
