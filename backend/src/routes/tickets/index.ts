@@ -2,6 +2,8 @@ import Redis from "ioredis";
 import Redlock from "redlock";
 import express from "express";
 import { jwtProtect } from "../middleware";
+import { listTicketsByRegion } from "../../database/tickets/get";
+import { updateTicket } from "../../database/tickets/update";
 import { updateRedisTicket, readRedisRegion } from "../../redis/index";
 import "dotenv/config";
 
@@ -52,7 +54,14 @@ async function reserveTicketFromId(
         reserver_time: new Date().toISOString(),
       });
 
-      res.json({ message: "Ticket reserved successfully" });
+      await updateTicket({
+        ticket_id: ticket_id,
+        user_id: user_id,
+        is_paid: false,
+        seat_number: Number(ticket.seat_number),
+      });
+
+      res.status(200).json({ message: "Ticket reserved successfully" });
       return true;
     } finally {
       // Release the lock
@@ -74,6 +83,11 @@ router.post("/reserveTicket", jwtProtect, async (req, res) => {
 
   try {
     const ticketIdList: string[] = await readRedisRegion(region_id);
+    if (ticketIdList.length === 0) {
+      // Step 2: If no tickets found in Redis, fetch from database
+      console.log("No tickets found in Redis, querying database...");
+      const tickets = await listTicketsByRegion(region_id, false);
+    }
 
     for (const ticket_id of ticketIdList) {
       const success = await reserveTicketFromId(ticket_id, user_id, res);
