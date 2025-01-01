@@ -1,83 +1,51 @@
 // components/MyTicket.tsx
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+const API_URL = process.env.REACT_APP_API_URL
 
 interface Ticket {
   id: number
-  event_name: string
-  event_date: string
-  ticket_type: string
-  price: number
+  activity_id: string
+  region_id: string
+  seat_number: number
+  is_paid: boolean
 }
 
 const MyTicket: React.FC = () => {
-  const { isLoggedIn, role } = useAuth()
-  // const [tickets, setTickets] = useState<Ticket[]>([])
+  const { isLoggedIn, role, jwtToken } = useAuth()
+  const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const tickets: Ticket[] = [
-    {
-      id: 1,
-      event_name: '周杰倫',
-      event_date: '2024-12-25',
-      ticket_type: 'VIP',
-      price: 100,
-    },
-    {
-      id: 2,
-      event_name: '音乐会',
-      event_date: '2025-01-10',
-      ticket_type: '普通票',
-      price: 50,
-    },
-    {
-      id: 3,
-      event_name: '电影放映',
-      event_date: '2024-12-30',
-      ticket_type: '学生票',
-      price: 30,
-    },
-  ]
-  // useEffect(() => {
-  //   if (isLoggedIn) {
-  //     // 假设我们已经将 `jwt_token` 存储在 `localStorage` 中，并将它传递给请求
-  //     const token = localStorage.getItem('jwt_token')
-  //     if (token) {
-  //       fetchTickets(token)
-  //     } else {
-  //       setError('未找到用户登录信息，请重新登录')
-  //     }
-  //   }
-  // }, [isLoggedIn])
-  //
-  // // 获取已购票数据
-  // const fetchTickets = async (token: string) => {
-  //   try {
-  //     const response = await fetch('/api/tickets', {
-  //       method: 'GET',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         Authorization: `Bearer ${token}`, // 将 JWT token 添加到请求头
-  //       },
-  //     })
-  //
-  //     if (!response.ok) {
-  //       throw new Error('无法获取票务数据')
-  //     }
-  //
-  //     const data = await response.json()
-  //     setTickets(data)
-  //   } catch (err: any) {
-  //     setError(err.message || '发生错误')
-  //   } finally {
-  //     setLoading(false)
-  //   }
-  // }
+  const fetchTickets = async () => {
+    try {
+      const response = await fetch(`${API_URL}/tickets/list`, {
+        method: 'GET',
+        headers: {
+          Authorization: `${jwtToken}`,
+        },
+        redirect: 'follow',
+      })
 
-  // if (loading) {
-  //   return <div>正在加载票务信息...</div>
-  // }
+      if (!response.ok) {
+        throw new Error(`${jwtToken}`)
+      }
+
+      const data = await response.json()
+      setTickets(data.tickets)
+    } catch (err: any) {
+      setError(err.message || '发生错误')
+    } finally {
+      setLoading(false)
+    }
+  }
+  React.useEffect(() => {
+    fetchTickets()
+  }, [])
+
+  if (loading) {
+    return <div>正在加载票务信息...</div>
+  }
 
   if (error) {
     return <div>{error}</div>
@@ -92,10 +60,7 @@ const MyTicket: React.FC = () => {
         <ul>
           {tickets.map((ticket) => (
             <li key={ticket.id}>
-              <h3>{ticket.event_name}</h3>
-              <p>时间：{ticket.event_date}</p>
-              <p>票种：{ticket.ticket_type}</p>
-              <p>价格：{ticket.price}元</p>
+              <h3>{ticket.is_paid}</h3>
             </li>
           ))}
         </ul>

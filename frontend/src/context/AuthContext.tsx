@@ -14,7 +14,7 @@ interface AuthContextType {
   role: 'user' | 'host' | null
   phone: string | null
   login: (
-    email:string,
+    email: string,
     name: string,
     token: string,
     role: 'user' | 'host',
@@ -66,6 +66,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoggedIn(true)
     setEmail(email)
     setName(name)
+    setJwtToken(token)
     setRole(role)
     setPhone(phone)
     localStorage.setItem('jwt_token', token) // 保存 JWT token 到 localStorage
@@ -87,6 +88,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setName(null)
     setRole(null)
     setPhone(null)
+    setJwtToken(null)
   }
 
   return (

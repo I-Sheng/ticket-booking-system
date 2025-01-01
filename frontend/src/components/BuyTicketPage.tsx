@@ -24,6 +24,7 @@ interface Activity {
   creator_id: string
   is_archived: boolean
   regions: {
+    _id: string
     region_name: string
     region_price: number
     region_capacity: number
@@ -49,7 +50,7 @@ const BuyTicketPage: React.FC = () => {
       if (response.ok) {
         const data = await response.json()
         setActivity(data.activity) // 保存活動資料
-        getArena(setArena, data.activity.arena_id) 
+        getArena(setArena, data.activity.arena_id)
         // 可能還需要調用 API 獲取 arena 資訊
       } else {
         console.error('Failed to fetch activity:', response.statusText)
@@ -68,7 +69,9 @@ const BuyTicketPage: React.FC = () => {
   // 計算總金額
   const calculateTotal = () => {
     if (activity && selectedRegion) {
-      const region = activity.regions.find((r) => r.region_name === selectedRegion)
+      const region = activity.regions.find(
+        (r) => r.region_name === selectedRegion
+      )
       if (region) {
         return region.region_price * ticketQuantity
       }
@@ -84,7 +87,23 @@ const BuyTicketPage: React.FC = () => {
     }
 
     // 在此執行實際的購票邏輯，如 API 提交等
-    alert('購票成功！')
+    const reserveTickets = async () => {
+      try {
+        const response = await fetch(`${API_URL}/tickets/reserveTicket`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            regionId: selectedRegion,
+          }),
+        })
+        if (response.ok) {
+          const data = await response.json()
+          alert('購票成功！')
+        }
+      } catch {}
+    }
   }
 
   if (!activity || !arena) {
@@ -114,7 +133,7 @@ const BuyTicketPage: React.FC = () => {
         >
           <option value="">請選擇區域</option>
           {activity.regions.map((region) => (
-            <option key={region.region_name} value={region.region_name}>
+            <option key={region._id} value={region._id}>
               {region.region_name} - ${region.region_price}
             </option>
           ))}
@@ -127,7 +146,9 @@ const BuyTicketPage: React.FC = () => {
           type="number"
           id="ticketQuantity"
           value={ticketQuantity}
-          onChange={(e) => setTicketQuantity(Math.max(1, parseInt(e.target.value)))}
+          onChange={(e) =>
+            setTicketQuantity(Math.max(1, parseInt(e.target.value)))
+          }
           min="1"
           disabled
           required
@@ -138,6 +159,10 @@ const BuyTicketPage: React.FC = () => {
         <p>
           <strong>總金額：</strong>${calculateTotal()}
         </p>
+        <p>
+          <strong>regionId：</strong>
+          {selectedRegion}
+        </p>
       </div>
 
       <button onClick={handleBuyTickets}>立即購票</button>
@@ -146,4 +171,3 @@ const BuyTicketPage: React.FC = () => {
 }
 
 export default BuyTicketPage
-
