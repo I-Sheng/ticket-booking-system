@@ -2,7 +2,7 @@ import Redis from "ioredis";
 import Redlock from "redlock";
 import express from "express";
 import { jwtProtect } from "../middleware";
-import { updateRedisTicket } from "../../redis/index";
+import { updateRedisTicket, readRedisRegion } from "../../redis/index";
 import "dotenv/config";
 
 const POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD as string;
@@ -16,12 +16,14 @@ const redlock = new Redlock([redis], {
 const router = express.Router();
 const TICKET_KEY_PREFIX = "ticket:";
 
-router.post("/reserveTicket", jwtProtect, async (req, res) => {
-  const { ticket_id } = req.body;
-  const user_id: string = req.body.decoded._id;
-
+async function reserveTicketFromId(
+  ticket_id: string,
+  user_id: string,
+  res: express.Response
+) {
   if (!ticket_id || !user_id) {
-    return res.status(400).json({ error: "Missing ticket_id or user_id" });
+    res.status(400).json({ error: "Missing ticket_id or user_id" });
+    return false;
   }
 
   const ticketKey = `${TICKET_KEY_PREFIX}${ticket_id}`;
@@ -37,7 +39,10 @@ router.post("/reserveTicket", jwtProtect, async (req, res) => {
       const ticket = await redis.hgetall(ticketKey);
 
       if (ticket.status !== "empty") {
-        throw new Error("Ticket is not available for reservation");
+        res
+          .status(400)
+          .json({ error: "Ticket is not available for reservation" });
+        return false;
       }
 
       // Reserve the ticket
@@ -48,19 +53,42 @@ router.post("/reserveTicket", jwtProtect, async (req, res) => {
       });
 
       res.json({ message: "Ticket reserved successfully" });
+      return true;
     } finally {
       // Release the lock
       await lock.release();
     }
   } catch (error: any) {
-    if (error) {
-      return res.status(423).json({ error: "Resource is already locked" });
+    if (error.name === "LockError") {
+      res.status(423).json({ error: "Resource is already locked" });
+    } else {
+      res.status(500).json({ error: error.message });
     }
+    return false;
+  }
+}
+
+router.post("/reserveTicket", jwtProtect, async (req, res) => {
+  const { region_id } = req.body;
+  const user_id: string = req.body.decoded._id;
+
+  try {
+    const ticketIdList: string[] = await readRedisRegion(region_id);
+
+    for (const ticket_id of ticketIdList) {
+      const success = await reserveTicketFromId(ticket_id, user_id, res);
+      if (success) {
+        return; // Stop after successfully reserving a ticket
+      }
+    }
+
+    res.status(404).json({ error: "No tickets available for reservation" });
+  } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.post("/buyTicket", async (req, res) => {
+router.post("/buyTicket", jwtProtect, async (req, res) => {
   const { ticket_id } = req.body;
   const user_id: string = req.body.decoded._id;
 
@@ -71,7 +99,9 @@ router.post("/buyTicket", async (req, res) => {
   const ticketKey = `${TICKET_KEY_PREFIX}${ticket_id}`;
 
   try {
-    await redlock.using([ticketKey], 5000, async () => {
+    const lock = await redlock.acquire([`lock:${ticketKey}`], 5000);
+
+    try {
       const ticket = await redis.hgetall(ticketKey);
 
       if (ticket.status !== "reserved" || ticket.user_id !== user_id) {
@@ -83,13 +113,15 @@ router.post("/buyTicket", async (req, res) => {
       });
 
       res.json({ message: "Ticket purchased successfully" });
-    });
+    } finally {
+      await lock.release();
+    }
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.post("/refundTicket", async (req, res) => {
+router.post("/refundTicket", jwtProtect, async (req, res) => {
   const { ticket_id } = req.body;
   const user_id: string = req.body.decoded._id;
 
@@ -100,10 +132,12 @@ router.post("/refundTicket", async (req, res) => {
   const ticketKey = `${TICKET_KEY_PREFIX}${ticket_id}`;
 
   try {
-    await redlock.using([ticketKey], 5000, async () => {
+    const lock = await redlock.acquire([`lock:${ticketKey}`], 5000);
+
+    try {
       const ticket = await redis.hgetall(ticketKey);
 
-      if (ticket.status !== "sold" || ticket.user_id !== user_id) {
+      if (ticket.status !== "paid" || ticket.user_id !== user_id) {
         throw new Error("Ticket is not eligible for a refund");
       }
 
@@ -114,7 +148,9 @@ router.post("/refundTicket", async (req, res) => {
       });
 
       res.json({ message: "Ticket refunded successfully" });
-    });
+    } finally {
+      await lock.release();
+    }
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
