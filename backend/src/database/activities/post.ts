@@ -20,7 +20,7 @@ export async function createActivityWithRegions(data: {
   const activityQuery = `
     INSERT INTO activities (on_sale_date, start_time, end_time, title, content, cover_img, price_level_img, arena_id, creator_id)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-    RETURNING *;
+    RETURNING _id;
   `
 
   const activityValues = [
