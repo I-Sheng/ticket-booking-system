@@ -126,7 +126,14 @@ router.post("/buyTicket", jwtProtect, async (req, res) => {
         status: "paid",
       });
 
-      res.json({ message: "Ticket purchased successfully" });
+      await updateTicket({
+        ticket_id: ticket_id,
+        user_id: user_id,
+        is_paid: true,
+        seat_number: Number(ticket.seat_number),
+      });
+
+      res.status(200).json({ message: "Ticket purchased successfully" });
     } finally {
       await lock.release();
     }
@@ -161,7 +168,13 @@ router.post("/refundTicket", jwtProtect, async (req, res) => {
         reserver_time: "null",
       });
 
-      res.json({ message: "Ticket refunded successfully" });
+      await updateTicket({
+        ticket_id: ticket_id,
+        user_id: undefined,
+        is_paid: false,
+      });
+
+      res.status(200).json({ message: "Ticket refunded successfully" });
     } finally {
       await lock.release();
     }
