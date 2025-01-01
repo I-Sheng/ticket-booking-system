@@ -30,7 +30,6 @@ const Home: React.FC = () => {
   const [arenaId, setArenaId] = React.useState('')
   const fetchActivities = async (arenaId: any) => {
     try {
-      const queryParam = arenaId ? `?arena_id=${arenaId}` : ''
       const response = await fetch(`${API_URL}/activities/list`, {
         method: 'GET',
         headers: {
@@ -63,6 +62,7 @@ const Home: React.FC = () => {
           flexWrap: 'wrap',
         }}
       >
+        {activities.length==0 && <p>尚無節目</p>}
         {activities.map((activity) => (
           <Widget
             key={activity._id}
