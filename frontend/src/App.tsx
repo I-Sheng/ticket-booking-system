@@ -10,6 +10,7 @@ import CreateActivity from './components/createActivity'
 import MyTicket from './components/myTicket' // 引入MyTicket组件
 import UserSettings from './components/UserSettings'
 import ChangePassword from './components/ChangePassword'
+import BuyTicketPage from './components/BuyTicketPage'
 
 const App: React.FC = () => {
   return (
@@ -41,7 +42,7 @@ const App: React.FC = () => {
                 我的票卷
               </Link>
               <Link style={{ padding: '30px' }} to="/settings">
-                用户设置
+                使用者設定
               </Link>
               <HostLink />
               {/* <Link to="/schedule">報名</Link> */}
@@ -71,6 +72,7 @@ const App: React.FC = () => {
                 path="/settings/change-password"
                 element={<ChangePassword />}
               />
+              <Route path="/buy-ticket/:id" element={<BuyTicketPage />} />
             </Routes>
           </div>
         </div>
@@ -105,7 +107,7 @@ const HostLink: React.FC = () => {
   const { role } = useAuth()
   return role === 'host' ? (
     <Link to="/create-activity" style={{ padding: '30px' }}>
-      创建活动
+      新增活動
     </Link>
   ) : null
 }

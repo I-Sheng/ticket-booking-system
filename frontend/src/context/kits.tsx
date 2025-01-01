@@ -1,4 +1,5 @@
 import React from 'react'
+const API_URL = process.env.REACT_APP_API_URL
 
 export function formatDate(dateString: string) {
   // 将字符串解析为 Date 对象
@@ -20,4 +21,44 @@ export function formatDate(dateString: string) {
 
   // 返回格式化的日期字符串
   return `${year}/${month}/${day} (${weekDay})`
+}
+export async function listArena(
+  setArenas: React.Dispatch<React.SetStateAction<any[]>>
+) {
+  try {
+    const response = await fetch(`${API_URL}/arenas/list`, {
+      method: 'GET',
+      redirect: 'follow',
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      setArenas(data.arenas)
+    } else {
+      console.error('Failed to fetch arenas:', response.statusText)
+    }
+  } catch (error) {
+    console.error('Error fetching arenas:', error)
+  }
+}
+
+export async function getArena(
+  setArena: React.Dispatch<React.SetStateAction<any>>,
+  arenaId: string
+) {
+  try {
+    const response = await fetch(`${API_URL}/arenas/arena/${arenaId}`, {
+      method: 'GET',
+      redirect: 'follow',
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      setArena(data)
+    } else {
+      console.error('Failed to fetch arenas:', response.statusText)
+    }
+  } catch (error) {
+    console.error('Error fetching arenas:', error)
+  }
 }
