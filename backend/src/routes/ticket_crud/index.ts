@@ -1,5 +1,5 @@
 import express from 'express';
-import { listTickets, listTicketsByActivity,listTicketsByRegion } from '../../database/tickets/get';
+import { listTickets,getTicketById, listTicketsByActivity,listTicketsByRegion } from '../../database/tickets/get';
 // import { deleteTicket } from '../../database/tickets/delete';
 import { createTicket} from '../../database/tickets/post';
 import { updateTicket } from '../../database/tickets/update';
@@ -22,24 +22,6 @@ router.post('/create',jwtProtect, hostProtect, async (req, res) => {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
-// // List tickets for a user
-// router.get('/list',jwtProtect, async (req, res) => {
-//   try {
-//     const user_id: string = req.body.decoded._id;
-//     const result = await listTickets(user_id as string);
-
-//     if ('error' in result) {
-//       return res.status(404).json({ error: result.error });
-//     }
-
-//     return res.status(200).json({ tickets: result });
-//   } catch (error) {
-//     console.error('Error in GET /tickets/list:', error);
-//     return res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// });
-
 
 // List tickets for a user with region names
 router.get('/list', jwtProtect, async (req, res) => {
@@ -69,21 +51,31 @@ router.get('/list', jwtProtect, async (req, res) => {
   }
 });
 
-// // List tickets for an activity
-// router.get('/list-by-activity',jwtProtect, hostProtect, async (req, res) => {
-//   try {
-//     const { activity_id } = req.query;
-//     const result = await listTicketsByActivity(activity_id as string);
+router.get('/get/:ticket_id', jwtProtect, async (req, res) => {
+  try {
+    const user_id: string = req.body.decoded._id;
+    const { ticket_id } = req.params;
 
-//     if ('error' in result) {
-//       return res.status(404).json({ error: result.error });
-//     }
-//     return res.status(200).json({ tickets: result });
-//   } catch (error) {
-//     console.error('Error in GET /tickets/list-by-activity:', error);
-//     return res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// });
+    const ticket = await getTicketById(ticket_id, user_id);
+
+    // If no ticket is found, return a neutral response
+    if (!ticket) {
+      return res.status(200).json({ ticket: null, message: 'No ticket found for this user' });
+    }
+
+    // Add region name to the ticket
+    const region = await getRegionById(ticket.region_id);
+    const ticketWithRegion = {
+      ...ticket,
+      region_name: 'error' in region ? null : region.region_name,
+    };
+
+    return res.status(200).json({ ticket: ticketWithRegion });
+  } catch (error) {
+    console.error('Error in GET /tickets/get/:ticket_id:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 // List tickets for an activity with optional is_paid filter
 router.get('/list-by-activity', jwtProtect, hostProtect, async (req, res) => {
