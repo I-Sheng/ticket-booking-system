@@ -2,8 +2,7 @@
 import React from 'react'
 import Widget from './widget'
 import { useAuth } from '../context/AuthContext'
-const API_URL = 'http://localhost:8080'
-
+const API_URL = process.env.REACT_APP_API_URL
 // test data
 interface Region {
   region_name: string
@@ -60,10 +59,11 @@ const Home: React.FC = () => {
       {isLoggedIn ? (
         <>
           {' '}
-          <p>您已經登入，享受您的體驗！</p>
         </>
       ) : (
-        <p>請登入以獲得完整功能。</p>
+        <>
+          <p>請登入以獲得完整功能。</p>
+        </>
       )}
       <div
         style={{

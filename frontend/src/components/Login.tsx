@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom' // 導入 useNavigate
 import { useAuth } from '../context/AuthContext' // 確保導入 useAuth
-const API_URL = 'http://localhost:8080'
+const API_URL = process.env.REACT_APP_API_URL
 
 const Login: React.FC = () => {
   const [email, setemail] = useState('')
