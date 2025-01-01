@@ -111,34 +111,34 @@ export const readRedisRegion = async (region_id: string): Promise<string[]> => {
   return await redis.smembers(regionStatusKey);
 };
 // Migrate tickets from Redis to PostgreSQL
-export const migrateTicketsToPostgres = async (): Promise<void> => {
-  console.log("enter migrate");
-  const keys = await redis.keys(`${TICKET_KEY_PREFIX}*`);
-  for (const key of keys) {
-    const ticket = await redis.hgetall(key);
-    if (!ticket.ticket_id) continue;
-    const dataToUpdate: {
-      ticket_id: string;
-      is_paid?: boolean;
-      seat_number?: number;
-    } = {
-      ticket_id: ticket.ticket_id,
-      seat_number: Number(ticket.seat_number),
-    };
-    if (ticket.status === "paid") {
-      dataToUpdate.is_paid = true;
-    }
-    console.log(dataToUpdate);
-    const result = await updateTicket(dataToUpdate);
-    if (result.error) {
-      console.error(
-        `Failed to update ticket ${ticket.ticket_id}:`,
-        result.error
-      );
-    }
-  }
-  console.log("Migration completed successfully.");
-};
+// export const migrateTicketsToPostgres = async (): Promise<void> => {
+//   console.log("enter migrate");
+//   const keys = await redis.keys(`${TICKET_KEY_PREFIX}*`);
+//   for (const key of keys) {
+//     const ticket = await redis.hgetall(key);
+//     if (!ticket.ticket_id) continue;
+//     const dataToUpdate: {
+//       ticket_id: string;
+//       is_paid?: boolean;
+//       seat_number?: number;
+//     } = {
+//       ticket_id: ticket.ticket_id,
+//       seat_number: Number(ticket.seat_number),
+//     };
+//     if (ticket.status === "paid") {
+//       dataToUpdate.is_paid = true;
+//     }
+//     console.log(dataToUpdate);
+//     const result = await updateTicket(dataToUpdate);
+//     if (result.error) {
+//       console.error(
+//         `Failed to update ticket ${ticket.ticket_id}:`,
+//         result.error
+//       );
+//     }
+//   }
+//   console.log("Migration completed successfully.");
+// };
 // Example usage (uncomment to test)
 // (async () => {
 //   await migrateTicketsToPostgres();
