@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-const API_URL = 'http://localhost:8080'
+// const API_URL = 'http://localhost:8080'
+const API_URL = process.env.REACT_APP_API_URL
 
 const Registration: React.FC = () => {
   const [step, setStep] = useState(1)
