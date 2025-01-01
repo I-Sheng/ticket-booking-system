@@ -54,7 +54,7 @@ const Login: React.FC = () => {
       <h2>登入</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="email">用戶名:</label>
+          <label htmlFor="email">帳號:</label>
           <input
             type="text"
             id="email"

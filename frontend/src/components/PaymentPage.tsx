@@ -1,23 +1,41 @@
 import React, { useEffect, useState } from 'react'
+import { useAuth } from '../context/AuthContext'
 import { useParams, useNavigate } from 'react-router-dom'
+
 const API_URL = process.env.REACT_APP_API_URL
 
+interface Ticket {
+  _id: string
+  activity_id: string
+  region_id: string
+  seat_number: number
+  is_paid: boolean
+}
 const PaymentPage: React.FC = () => {
   const { id } = useParams()
-  const [ticket, setTicket] = useState<any>(null) // 儲存票據詳情
+  const { jwtToken, name, phone } = useAuth()
+  const [ticket, setTicket] = useState<Ticket>() // 儲存票據詳情
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const [cardNumber, setCardNumber] = useState(['1234', '5678', '9012', '3456']) // 四個輸入框
+  const [cvv, setCvv] = useState('123')
+  const [expiryMonth, setExpiryMonth] = useState('01')
+  const [expiryYear, setExpiryYear] = useState('27')
+
   const navigate = useNavigate()
 
-  // 假設有一個 API 函數來根據票據ID查詢詳細資料
   const fetchTicketDetails = async (id: string) => {
     try {
       setLoading(true)
-      const response = await fetch(`${API_URL}/tickets/${id}`)
+      const response = await fetch(`${API_URL}/tickets/get/${id}`, {
+        method: 'GET',
+        headers: { authorization: `${jwtToken}` },
+        redirect: 'follow',
+      })
       if (response.ok) {
-        const data = response.json() // 使用 API 獲取票據信息
-        setTicket(data)
+        const data = await response.json() // 使用 API 獲取票據信息
+        setTicket(data.ticket)
         setLoading(false)
       }
     } catch (error: any) {
@@ -27,20 +45,56 @@ const PaymentPage: React.FC = () => {
     }
   }
 
-  // 用戶在初始化頁面時加載票據詳細信息
   useEffect(() => {
     if (id) {
       fetchTicketDetails(id)
     }
   }, [id])
 
+  const handleCardInput = (index: number, value: string) => {
+    if (/^\d{0,4}$/.test(value)) {
+      const updatedCardNumber = [...cardNumber]
+      updatedCardNumber[index] = value
+      setCardNumber(updatedCardNumber)
+    }
+  }
+
   const handlePayment = async () => {
+    if (
+      cardNumber.some((num) => num.length < 4) ||
+      !cvv ||
+      !expiryMonth ||
+      !expiryYear
+    ) {
+      alert('請填寫完整的信用卡信息')
+      return
+    }
     try {
-      // 模擬付款處理，應該替換為實際的付款邏輯（例如調用支付API）
       console.log('開始付款處理...')
-      // 完成支付後，將票務設置為已付款，或者調用API更新支付狀態
-      // 用navigate來導向成功頁面或主頁
-      navigate(`/payment-success/${id}`)
+
+      const myHeaders = new Headers()
+      myHeaders.append('Authorization', `${jwtToken}`) // 使用 Context 中的 jwtToken
+      myHeaders.append('Content-Type', 'application/x-www-form-urlencoded')
+
+      const urlencoded = new URLSearchParams()
+      urlencoded.append('ticket_id', id!)
+
+      const requestOptions: RequestInit = {
+        method: 'POST',
+        headers: myHeaders,
+        body: urlencoded,
+        redirect: 'follow',
+      }
+      const response = await fetch(
+        `${API_URL}/tickets/buyTicket`,
+        requestOptions
+      )
+      if (response.ok) {
+        alert('付款成功')
+        navigate(`/myTicket`)
+      }else{
+        alert('付款失敗')
+      }
     } catch (error) {
       setError('付款失敗，請重試。')
     }
@@ -60,33 +114,92 @@ const PaymentPage: React.FC = () => {
 
   return (
     <div style={{ padding: '20px', maxWidth: '600px', margin: 'auto' }}>
-      <h2>付款頁面</h2>
+      <h2>付款</h2>
 
-      {/* 顯示票據詳細信息 */}
       <div>
-        <h3>訂單詳情</h3>
         <p>
           <strong>訂單編號: </strong>
           {ticket._id}
         </p>
         <p>
-          <strong>活動名稱: </strong>
-          {ticket.activity.title}
+          <strong>訂單金額: </strong>
         </p>
         <p>
-          <strong>座位號: </strong>
+          <strong>座位: </strong>
           {ticket.seat_number}
         </p>
         <p>
-          <strong>區域: </strong>
-          {ticket.region_name}
+          <strong>姓名: </strong>
+          {name}
         </p>
         <p>
-          <strong>總額: </strong>￥{ticket.price}
+          <strong>電話: </strong>
+          {phone}
         </p>
+
+        {/* 新增信用卡輸入 */}
+        <div style={{ marginTop: '20px' }}>
+          <label>
+            信用卡卡號
+            <div style={{ display: 'flex', padding: '4px', gap: '5px' }}>
+              {cardNumber.map((num, index) => (
+                <input
+                  disabled
+                  key={index}
+                  type="text"
+                  value={num}
+                  maxLength={4}
+                  onChange={(e) => handleCardInput(index, e.target.value)}
+                  style={{ width: '40px', padding: '4px', textAlign: 'center' }}
+                />
+              ))}
+            </div>
+          </label>
+          <label style={{ display: 'block', marginTop: '10px' }}>
+            信用卡檢查碼
+            <div>
+              <input
+                disabled
+                type="text"
+                placeholder="xxx"
+                value={cvv}
+                onChange={(e) =>
+                  /^\d{0,3}$/.test(e.target.value) && setCvv(e.target.value)
+                }
+                style={{ width: '40px', padding: '4px', margin: '5px' }}
+              />
+            </div>
+          </label>
+          <label style={{ display: 'block', marginTop: '10px' }}>
+            信用卡到期日期
+            <div style={{ display: 'flex', gap: '10px', padding: '4px' }}>
+              <input
+                disabled
+                type="text"
+                placeholder="MM"
+                value={expiryMonth}
+                onChange={(e) =>
+                  /^\d{0,2}$/.test(e.target.value) &&
+                  setExpiryMonth(e.target.value)
+                }
+                style={{ width: '40px', padding: '4px', textAlign: 'center' }}
+              />
+              <input
+                disabled
+                type="text"
+                placeholder="YY"
+                value={expiryYear}
+                onChange={(e) =>
+                  /^\d{0,4}$/.test(e.target.value) &&
+                  setExpiryYear(e.target.value)
+                }
+                style={{ width: '40px', padding: '4px', textAlign: 'center' }}
+              />
+            </div>
+          </label>
+        </div>
       </div>
 
-      {/* 顯示付款按鈕 */}
       <div style={{ marginTop: '20px' }}>
         <button
           onClick={handlePayment}
@@ -103,23 +216,22 @@ const PaymentPage: React.FC = () => {
         </button>
       </div>
 
-      {/* 返回按鈕，返回票據詳細頁或訂單頁面 */}
-      <div style={{ marginTop: '10px' }}>
-        <button
-          onClick={() => navigate(-1)} // 使用navigate(-1)來返回上一頁
-          style={{
-            padding: '10px 20px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            marginTop: '10px',
-          }}
-        >
-          返回
-        </button>
-      </div>
+      {/* <div style={{ marginTop: '10px' }}> */}
+      {/*   <button */}
+      {/*     onClick={() => navigate(-1)} */}
+      {/*     style={{ */}
+      {/*       padding: '10px 20px', */}
+      {/*       backgroundColor: '#007bff', */}
+      {/*       color: 'white', */}
+      {/*       border: 'none', */}
+      {/*       borderRadius: '5px', */}
+      {/*       cursor: 'pointer', */}
+      {/*       marginTop: '10px', */}
+      {/*     }} */}
+      {/*   > */}
+      {/*     返回 */}
+      {/*   </button> */}
+      {/* </div> */}
     </div>
   )
 }
