@@ -1,182 +1,108 @@
-import Redis from "ioredis";
 import express from "express";
-import { updateTicket } from "../database/tickets/update";
-import "dotenv/config";
-import { v4 as uuidv4 } from "uuid";
+import { encryptPassword, comparePassword, generateJWT } from "./util";
+import { createUser } from "../../database/auth/post";
+import type { NewUserType } from "../../database/auth/post";
+import { getUser } from "../../database/auth/get";
+import { updateUser } from "../../database/auth/put";
+import { jwtProtect } from "../middleware";
 
-const POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD as string;
 const router = express.Router();
 
-// Define the interface for the ticket object
-export type Ticket = {
-  ticket_id: string; // Changed to UUID format
-  user_id: string | null;
-  status: string;
-  activity_id: string;
-  region_id: string;
-  seat_number: string;
-  reserver_time: Date;
-};
+router.get("/", async (_req, res) => {
+  res.status(200).send("Auth routes are available!");
+});
 
-// Initialize Redis client
-const redis = new Redis();
+router.post("/register", async (req, res) => {
+  const { email, password, phone_number, role, username } = req.body;
 
-// Define the Redis key namespace for tickets
-const TICKET_KEY_PREFIX = "ticket:";
+  // Check if user already exists
+  const hasUser = await getUser(email);
+  if (!hasUser.error && hasUser) {
+    return res.status(409).send("User already exists");
+  }
 
-// Helper functions
-const getRedisKey = (ticket_id: string) => `${TICKET_KEY_PREFIX}${ticket_id}`;
-const getRegionStatusKey = (region_id: string, status: string) =>
-  `region:${region_id}:status:${status}`;
+  // Encrypt password
+  const encryptedPassword = encryptPassword(password);
 
-// API endpoints
-router.post("/tickets", async (req, res) => {
-  const ticket: Ticket = {
-    ...req.body,
-    ticket_id: uuidv4(), // Generate a UUID for ticket_id
+  // Create new user
+  const newUser: NewUserType = {
+    email,
+    username,
+    password: encryptedPassword,
+    role,
+    phone_number,
   };
-  const key = getRedisKey(ticket.ticket_id);
-  const regionStatusKey = getRegionStatusKey(ticket.region_id, ticket.status);
 
-  try {
-    await redis.hset(key, {
-      ticket_id: ticket.ticket_id,
-      user_id: ticket.user_id || "",
-      status: ticket.status,
-      activity_id: ticket.activity_id,
-      region_id: ticket.region_id,
-      seat_number: ticket.seat_number,
-      reserver_time: ticket.reserver_time,
-    });
+  const result = await createUser(newUser);
 
-    await redis.sadd(regionStatusKey, ticket.ticket_id);
-    res
-      .status(201)
-      .send({
-        message: "Ticket created successfully.",
-        ticket_id: ticket.ticket_id,
-      });
-  } catch (error) {
-    res.status(500).send({ error: "Failed to create ticket." });
+  if (result.error) {
+    console.error(result.error);
+    return res.status(500).send(result.error);
   }
+
+  return res.status(201).json({ email: result.email, id: result.id });
 });
 
-router.get("/tickets/:id", async (req, res) => {
-  const ticket_id = req.params.id;
-  const key = getRedisKey(ticket_id);
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
 
-  try {
-    const data = await redis.hgetall(key);
-
-    if (Object.keys(data).length === 0) {
-      res.status(404).send({ error: "Ticket not found." });
-      return;
-    }
-
-    const ticket: Ticket = {
-      ticket_id: data.ticket_id,
-      user_id: data.user_id || null,
-      status: data.status,
-      activity_id: data.activity_id,
-      region_id: data.region_id,
-      seat_number: data.seat_number,
-      reserver_time: new Date(data.reserver_time),
-    };
-
-    res.status(200).send(ticket);
-  } catch (error) {
-    res.status(500).send({ error: "Failed to read ticket." });
+  // Check if user exists
+  const user = await getUser(email);
+  if (user.error || !user) {
+    return res.status(404).send("User not found");
   }
+
+  // Check if password matches
+  if (!comparePassword(password, user.password)) {
+    return res.status(401).send("Invalid credentials");
+  }
+
+  // Generate JWT token
+  const jwtToken = generateJWT(user._id, user.email, user.role);
+
+  return res.status(200).json({
+    email: user.email,
+    username: user.username,
+    role: user.role,
+    jwtToken,
+  });
 });
 
-router.put("/tickets/:id", async (req, res) => {
-  const ticket_id = req.params.id;
-  const updates: Partial<Ticket> = req.body;
-  const key = getRedisKey(ticket_id);
+router.get("/userinfo", jwtProtect, async (req, res) => {
+  const email = req.body.decoded.email;
+  console.log(email);
 
-  try {
-    const existingTicket = await redis.hgetall(key);
-
-    if (Object.keys(existingTicket).length === 0) {
-      res.status(404).send({ error: "Ticket not found." });
-      return;
-    }
-
-    const updatedTicket = {
-      ...existingTicket,
-      ...updates,
-    };
-
-    await redis.hset(key, updatedTicket);
-    res.status(200).send({ message: "Ticket updated successfully." });
-  } catch (error) {
-    res.status(500).send({ error: "Failed to update ticket." });
+  // Retrieve user information
+  const user = await getUser(email);
+  if (user.error || !user) {
+    return res.status(404).send("User not found");
   }
+
+  return res.status(200).json({
+    email: user.email,
+    username: user.username,
+    role: user.role,
+    phone_number: user.phone_number,
+  });
 });
 
-router.delete("/tickets/:id", async (req, res) => {
-  const ticket_id = req.params.id;
-  const key = getRedisKey(ticket_id);
+router.put("/", jwtProtect, async (req, res) => {
+  const email = req.body.decoded.email;
+  const { username, phone_number } = req.body;
 
-  try {
-    const ticket = await redis.hgetall(key);
-
-    if (Object.keys(ticket).length === 0) {
-      res.status(404).send({ error: "Ticket not found." });
-      return;
-    }
-
-    const regionStatusKey = getRegionStatusKey(ticket.region_id, ticket.status);
-    await redis.del(key);
-    await redis.srem(regionStatusKey, ticket_id);
-
-    res.status(200).send({ message: "Ticket deleted successfully." });
-  } catch (error) {
-    res.status(500).send({ error: "Failed to delete ticket." });
+  // Update user information
+  const updatedUser = await updateUser(email, { username, phone_number });
+  if (updatedUser.error) {
+    console.error(updatedUser.error);
+    return res.status(500).send(updatedUser.error);
   }
-});
 
-router.get("/regions/:id/tickets", async (req, res) => {
-  const region_id = req.params.id;
-  const regionStatusKey = getRegionStatusKey(region_id, "empty");
-
-  try {
-    const tickets = await redis.smembers(regionStatusKey);
-    res.status(200).send(tickets);
-  } catch (error) {
-    res.status(500).send({ error: "Failed to fetch tickets by region." });
-  }
-});
-
-router.post("/migrate", async (req, res) => {
-  try {
-    const keys = await redis.keys(`${TICKET_KEY_PREFIX}*`);
-
-    for (const key of keys) {
-      const ticket = await redis.hgetall(key);
-
-      if (!ticket.ticket_id) continue;
-
-      const dataToUpdate: {
-        ticket_id: string;
-        is_paid?: boolean;
-        seat_number?: number;
-      } = {
-        ticket_id: ticket.ticket_id,
-        seat_number: Number(ticket.seat_number),
-      };
-
-      if (ticket.status === "paid") {
-        dataToUpdate.is_paid = true;
-      }
-
-      await updateTicket(dataToUpdate);
-    }
-
-    res.status(200).send({ message: "Migration completed successfully." });
-  } catch (error) {
-    res.status(500).send({ error: "Failed to migrate tickets." });
-  }
+  return res.status(200).json({
+    email: updatedUser.email,
+    username: updatedUser.username,
+    role: updatedUser.role,
+    phone_number: updatedUser.phone_number,
+  });
 });
 
 export default router;
