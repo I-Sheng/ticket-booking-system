@@ -16,6 +16,38 @@ export async function listTickets(user_id: string) {
   }
 }
 
+// export async function getTicketById(ticket_id: string, user_id: string) {
+//   const qstring = `
+//     SELECT * FROM tickets WHERE _id = $1 AND user_id = $2;
+//   `;
+//   try {
+//     const result = await query(qstring, [ticket_id, user_id]);
+//     if (result.rowCount === 0) {
+//       return { error: 'Ticket not found for this user' };
+//     }
+//     return result.rows[0]; // Return single ticket
+//   } catch (error) {
+//     console.error('Error fetching ticket by ID:', error);
+//     return { error: 'Failed to fetch ticket' };
+//   }
+// }
+export async function getTicketById(ticket_id: string, user_id: string) {
+  const qstring = `
+    SELECT * FROM tickets WHERE _id = $1 AND user_id = $2;
+  `;
+  try {
+    const result = await query(qstring, [ticket_id, user_id]);
+    if (result.rowCount === 0) {
+      return null; // Return null if no ticket is found
+    }
+    return result.rows[0]; // Return single ticket
+  } catch (error) {
+    console.error('Error fetching ticket by ID:', error);
+    return { error: 'Failed to fetch ticket' };
+  }
+}
+
+
 export async function listTicketsByActivity(activity_id: string, is_paid?: string) {
   // Base query string
   let qstring = `SELECT * FROM tickets WHERE activity_id = $1`;
