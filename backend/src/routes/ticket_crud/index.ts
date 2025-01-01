@@ -1,5 +1,5 @@
 import express from 'express';
-import { listTickets, listTicketsByActivity } from '../../database/tickets/get';
+import { listTickets, listTicketsByActivity,listTicketsByActivityAndRegion } from '../../database/tickets/get';
 // import { deleteTicket } from '../../database/tickets/delete';
 import { createTicket} from '../../database/tickets/post';
 import { updateTicket } from '../../database/tickets/update';
@@ -38,11 +38,32 @@ router.get('/list',jwtProtect, async (req, res) => {
   }
 });
 
-// List tickets for an activity
-router.get('/list-by-activity',jwtProtect, hostProtect, async (req, res) => {
+// // List tickets for an activity
+// router.get('/list-by-activity',jwtProtect, hostProtect, async (req, res) => {
+//   try {
+//     const { activity_id } = req.query;
+//     const result = await listTicketsByActivity(activity_id as string);
+
+//     if ('error' in result) {
+//       return res.status(404).json({ error: result.error });
+//     }
+//     return res.status(200).json({ tickets: result });
+//   } catch (error) {
+//     console.error('Error in GET /tickets/list-by-activity:', error);
+//     return res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// });
+
+// List tickets for an activity with optional is_paid filter
+router.get('/list-by-activity', jwtProtect, hostProtect, async (req, res) => {
   try {
-    const { activity_id } = req.query;
-    const result = await listTicketsByActivity(activity_id as string);
+    const { activity_id, is_paid } = req.query;
+
+    if (!activity_id) {
+      return res.status(400).json({ error: 'Missing activity_id' });
+    }
+
+    const result = await listTicketsByActivity(activity_id as string, is_paid as string | undefined);
 
     if ('error' in result) {
       return res.status(404).json({ error: result.error });
@@ -50,6 +71,50 @@ router.get('/list-by-activity',jwtProtect, hostProtect, async (req, res) => {
     return res.status(200).json({ tickets: result });
   } catch (error) {
     console.error('Error in GET /tickets/list-by-activity:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+// // List tickets for an activity and region
+// router.get('/list-by-activity-and-region', jwtProtect, hostProtect, async (req, res) => {
+//   try {
+//     const { activity_id, region_id } = req.query;
+    
+//     if (!activity_id || !region_id) {
+//       return res.status(400).json({ error: 'Missing activity_id or region_id' });
+//     }
+
+//     const result = await listTicketsByActivityAndRegion(activity_id as string, region_id as string);
+
+//     if ('error' in result) {
+//       return res.status(404).json({ error: result.error });
+//     }
+//     return res.status(200).json({ tickets: result });
+//   } catch (error) {
+//     console.error('Error in GET /tickets/list-by-activity-and-region:', error);
+//     return res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// });
+
+
+// List tickets for an activity and region with optional is_paid filter
+router.get('/list-by-activity-and-region', jwtProtect, hostProtect, async (req, res) => {
+  try {
+    const { activity_id, region_id, is_paid } = req.query;
+
+    if (!activity_id || !region_id) {
+      return res.status(400).json({ error: 'Missing activity_id or region_id' });
+    }
+
+    const result = await listTicketsByActivityAndRegion(activity_id as string, region_id as string, is_paid as string | undefined);
+
+    if ('error' in result) {
+      return res.status(404).json({ error: result.error });
+    }
+    return res.status(200).json({ tickets: result });
+  } catch (error) {
+    console.error('Error in GET /tickets/list-by-activity-and-region:', error);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 });
