@@ -1,6 +1,7 @@
 // src/components/UserSettings.tsx
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
+const API_URL = process.env.REACT_APP_API_URL
 
 const UserSettings: React.FC = () => {
   const { name, login } = useAuth() // 从 AuthContext 获取 name 和 login 方法
@@ -8,34 +9,56 @@ const UserSettings: React.FC = () => {
   const [phone, setPhone] = useState<string>(
     localStorage.getItem('phone') || ''
   )
-  const [email] = useState<string>(
-    localStorage.getItem('email') || 'johndoe@example.com'
-  )
+  const [email] = useState<string>(localStorage.getItem('email') || '')
 
   useEffect(() => {
     setCurrentName(name || '')
   }, [name])
 
-  const handleSaveChanges = (e: React.FormEvent) => {
+  const handleSaveChanges = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // 假设保持 token 和 role 不变
-    const token = localStorage.getItem('jwt_token') || ''
+    const token = localStorage.getItem('jwt_token')
     const role = localStorage.getItem('role') as 'user' | 'host'
 
-    if (token && role) {
-      localStorage.setItem('name', currentName) // 保存新的名字到本地存储
-      localStorage.setItem('phone', phone) // 保存手机号到本地存储
+    if (!token || !role) {
+      alert('未找到有效的登入資訊，請重新登入。')
+      return
+    }
 
-      // 更新 AuthContext 的 name
-      login(currentName, token, role)
+    try {
+      const response = await fetch(`${API_URL}/auth`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token,
+        },
+        body: JSON.stringify({
+          username: currentName,
+          phone_number: phone,
+        }),
+      })
 
-      alert('更新成功')
-    } else {
-      alert('失败')
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || '更新失敗')
+      }
+
+      const updatedUser = await response.json()
+
+      // 保存更新後的用戶資訊到本地存儲
+      localStorage.setItem('name', updatedUser.username)
+      localStorage.setItem('phone', updatedUser.phone_number)
+
+      // 更新 AuthContext 的用戶資訊
+      login(email, updatedUser.username, token, role, updatedUser.phone_number)
+
+      alert('資訊更新成功')
+    } catch (error: any) {
+      console.error('更新失敗:', error)
+      alert(`更新失敗: ${error.message}`)
     }
   }
-
   return (
     <div
       style={{

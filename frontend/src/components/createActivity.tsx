@@ -1,10 +1,21 @@
 import React, { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { listArena } from '../context/kits'
+import { useNavigate } from 'react-router-dom'
 const API_URL = process.env.REACT_APP_API_URL
 
+interface Arena {
+  _id: string
+  title: string
+  address: string
+  capacity: number
+}
+
 const CreateActivity = () => {
+  const { jwtToken, role } = useAuth()
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
+  const [activityDate, setActivityDate] = useState('')
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
   const [onSaleDate, setOnSaleDate] = useState('')
@@ -15,8 +26,19 @@ const CreateActivity = () => {
   const [coverImg, setCoverImg] = useState<File | null>(null)
   const [priceLevelImg, setPriceLevelImg] = useState<File | null>(null)
   const [status, setStatus] = useState('')
-  const { jwtToken } = useAuth()
+  const [arenas, setArenas] = useState<Arena[]>([])
+  const navigate = useNavigate()
 
+  React.useEffect(() => {
+    listArena(setArenas)
+  }, [])
+
+  // 合併選擇的日期和時間
+  const combineDateTime = (date: string, time: string): string => {
+    return `${date}T${time}:00` // 合併成ISO日期時間格式
+  }
+
+  // 處理區域欄位的變更
   const handleRegionChange = (index: number, field: string, value: any) => {
     const updatedRegions: any[] = [...regions]
     updatedRegions[index][field] = value
@@ -30,8 +52,13 @@ const CreateActivity = () => {
     // Append text fields to formData
     formData.append('title', title)
     formData.append('content', content)
-    formData.append('start_time', startTime)
-    formData.append('end_time', endTime)
+
+    // Combine date and time for start_time and end_time
+    const combinedStartTime = combineDateTime(activityDate, startTime)
+    const combinedEndTime = combineDateTime(activityDate, endTime)
+
+    formData.append('start_time', combinedStartTime)
+    formData.append('end_time', combinedEndTime)
     formData.append('on_sale_date', onSaleDate)
     formData.append('arena_id', arenaId)
 
@@ -63,8 +90,21 @@ const CreateActivity = () => {
 
       if (response.ok) {
         const data = await response.json()
-        setStatus('Activity created successfully')
+        alert('活動新增成功')
         console.log('Activity created:', data)
+        setTitle('')
+        setContent('')
+        setActivityDate('')
+        setStartTime('')
+        setEndTime('')
+        setOnSaleDate('')
+        setArenaId('')
+        setRegions([{ region_name: '', region_price: 0, region_capacity: 0 }])
+        setCoverImg(null)
+        setPriceLevelImg(null)
+
+        // 跳轉回首頁
+        navigate('/') // 使用useNavigate來導向首頁
       } else {
         const errorData = await response.json()
         setStatus(`Error: ${errorData.error}`)
@@ -82,12 +122,15 @@ const CreateActivity = () => {
     ])
   }
 
+  if (role != 'host') {
+    return <h2>Permissions denied</h2>
+  }
   return (
     <div>
       <h2>新增活動</h2>
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <div>
-          <label htmlFor="title">活動名稱</label>
+          <label htmlFor="title">活動名稱：</label>
           <input
             type="text"
             id="title"
@@ -97,7 +140,7 @@ const CreateActivity = () => {
           />
         </div>
         <div>
-          <label htmlFor="content">說明</label>
+          <label htmlFor="content">說明：</label>
           <textarea
             id="content"
             value={content}
@@ -105,10 +148,22 @@ const CreateActivity = () => {
             required
           ></textarea>
         </div>
+
+        {/* 變更為選擇日期和時間 */}
         <div>
-          <label htmlFor="start_time">開始時間</label>
+          <label htmlFor="activity_date">活動日期：</label>
           <input
-            type="datetime-local"
+            type="date"
+            id="activity_date"
+            value={activityDate}
+            onChange={(e) => setActivityDate(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="start_time">開始時間：</label>
+          <input
+            type="time"
             id="start_time"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
@@ -116,17 +171,18 @@ const CreateActivity = () => {
           />
         </div>
         <div>
-          <label htmlFor="end_time">結束時間</label>
+          <label htmlFor="end_time">結束時間：</label>
           <input
-            type="datetime-local"
+            type="time"
             id="end_time"
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
             required
           />
         </div>
+
         <div>
-          <label htmlFor="on_sale_date">開賣日</label>
+          <label htmlFor="on_sale_date">開賣日：</label>
           <input
             type="datetime-local"
             id="on_sale_date"
@@ -136,23 +192,31 @@ const CreateActivity = () => {
           />
         </div>
         <div>
-          <label htmlFor="arena_id">場館編號</label>
-          <input
-            type="text"
+          <label htmlFor="arena_id">場館：</label>
+          <select
             id="arena_id"
             value={arenaId}
-            onChange={(e) => setArenaId(e.target.value)}
+            onChange={(e) => setArenaId(e.target.value)} // 當選擇時設置 arenaId 為 _id
             required
-          />
+          >
+            <option value="">選擇場館</option>
+            {arenas.map((arena) => (
+              <option key={arena._id} value={arena._id}>
+                {arena.title}
+              </option>
+            ))}
+          </select>
         </div>
 
         <h3>區域</h3>
-        <p>區域編號、價格、座位上限</p>
+        <p style={{ fontStyle: 'italic', color: '#666', marginBottom: '10px' }}>
+          區域名稱、價格、座位上限
+        </p>
         {regions.map((region, index) => (
           <div key={index} className="region-fields">
             <input
               type="text"
-              placeholder="區域編號"
+              placeholder="區域名稱"
               value={region.region_name}
               onChange={(e) =>
                 handleRegionChange(index, 'region_name', e.target.value)

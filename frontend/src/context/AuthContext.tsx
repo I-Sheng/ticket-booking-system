@@ -8,11 +8,18 @@ import React, {
 } from 'react'
 
 interface AuthContextType {
+  jwtToken: string | null
   isLoggedIn: boolean
   name: string | null
-  jwtToken: string | null
   role: 'user' | 'host' | null
-  login: (name: string, token: string, role: 'user' | 'host') => void
+  phone: string | null
+  login: (
+    email:string,
+    name: string,
+    token: string,
+    role: 'user' | 'host',
+    phone: string
+  ) => void
   logout: () => void
 }
 
@@ -24,8 +31,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [email, setEmail] = useState<string | null>(null)
   const [name, setName] = useState<string | null>(null)
   const [role, setRole] = useState<'user' | 'host' | null>(null) // 'user' 或 'host'
+  const [phone, setPhone] = useState<string | null>(null)
   const [jwtToken, setJwtToken] = useState<string | null>(null)
 
   useEffect(() => {
@@ -33,22 +42,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const token = localStorage.getItem('jwt_token')
     const savedName = localStorage.getItem('name')
     const savedRole = localStorage.getItem('role') as 'user' | 'host' | null // 强制转换为具体的 role 类型
+    const savedPhone = localStorage.getItem('phone')
 
     if (token) {
       setJwtToken(token)
       setIsLoggedIn(true)
       setName(savedName)
       setRole(savedRole)
+      setPhone(savedPhone)
     }
   }, [])
 
   // 登录方法
-  const login = (name: string, token: string, role: 'user' | 'host') => {
+  const login = (
+    email: string,
+    name: string,
+    token: string,
+    role: 'user' | 'host',
+    phone: string
+  ) => {
     setIsLoggedIn(true)
     setName(name)
+    setRole(role)
+    setPhone(phone)
     localStorage.setItem('jwt_token', token) // 保存 JWT token 到 localStorage
     localStorage.setItem('name', name) // 保存 name 到 localStorage
     localStorage.setItem('role', role) // 存储角色信息
+    localStorage.setItem('phone', phone) // 存储角色信息
   }
 
   // 登出方法
@@ -56,15 +76,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('jwt_token')
     localStorage.removeItem('name')
     localStorage.removeItem('role')
-    setIsLoggedIn(false)
+    localStorage.removeItem('phone')
     setIsLoggedIn(false)
     setName(null)
     setRole(null)
+    setPhone(null)
   }
 
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn, name, jwtToken, role, login, logout }}
+      value={{ jwtToken, isLoggedIn, name, role, phone, login, logout }}
     >
       {children}
     </AuthContext.Provider>

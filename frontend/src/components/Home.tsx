@@ -55,16 +55,7 @@ const Home: React.FC = () => {
 
   return (
     <div>
-      <h1>歡迎來到首頁！</h1>
-      {isLoggedIn ? (
-        <>
-          {' '}
-        </>
-      ) : (
-        <>
-          <p>請登入以獲得完整功能。</p>
-        </>
-      )}
+      <h1>節目資訊</h1>
       <div
         style={{
           display: 'flex',
