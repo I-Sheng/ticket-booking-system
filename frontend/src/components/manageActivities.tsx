@@ -1,9 +1,10 @@
-// src/components/Home.tsx
-import React from 'react'
+import React, { useState } from 'react'
 import Widget from './widget'
 import { useAuth } from '../context/AuthContext'
+import { listArena } from '../context/kits'
+import { useNavigate } from 'react-router-dom'
 const API_URL = process.env.REACT_APP_API_URL
-// test data
+
 interface Region {
   region_name: string
   region_price: number
@@ -24,8 +25,9 @@ interface Activity {
   is_archived: boolean
   regions: Region[]
 }
-const Home: React.FC = () => {
-  const { isLoggedIn } = useAuth()
+
+const ManageActivities = () => {
+  const { jwtToken, role } = useAuth()
   const [activities, setActivities] = React.useState<Activity[]>([])
   const [arenaId, setArenaId] = React.useState('')
   const fetchActivities = async (arenaId: any) => {
@@ -52,9 +54,12 @@ const Home: React.FC = () => {
     fetchActivities(arenaId) // 页面加载时获取活动数据
   }, [])
 
+  if (role != 'host') {
+    return <h2>Permissions denied</h2>
+  }
   return (
     <div>
-      <h1>節目資訊</h1>
+      <h1>管理活動</h1>
       <div
         style={{
           display: 'flex',
@@ -62,12 +67,12 @@ const Home: React.FC = () => {
           flexWrap: 'wrap',
         }}
       >
-        {activities.length == 0 && <p>尚無節目</p>}
+        {activities.length == 0 && <p>尚無活動</p>}
         {activities.map((activity) => (
           <Widget
             key={activity._id}
             id={activity._id}
-            path={'activity'}
+            path={'editActivity'}
             name={activity.title}
             on_sale_date={activity.on_sale_date}
             start_date={activity.start_time}
@@ -80,4 +85,4 @@ const Home: React.FC = () => {
   )
 }
 
-export default Home
+export default ManageActivities
