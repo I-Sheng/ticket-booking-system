@@ -59,7 +59,9 @@ const ManageActivities = () => {
   }
   return (
     <div>
-      <h1>管理活動</h1>
+      <p style={{ letterSpacing: '1.3px', color: '#666', fontSize: '14px' }}>
+        管理活動
+      </p>
       <div
         style={{
           display: 'flex',

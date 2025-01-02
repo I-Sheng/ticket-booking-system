@@ -1,5 +1,6 @@
 // App.tsx
 import React, { useState } from 'react'
+import './styles.css'
 import {
   useNavigate,
   BrowserRouter as Router,
@@ -22,6 +23,7 @@ import ManageActivities from './components/manageActivities'
 import EditActivity from './components/editActivity'
 
 const App: React.FC = () => {
+  const { isLoggedIn } = useAuth()
   return (
     <AuthProvider>
       <Router>
@@ -31,8 +33,12 @@ const App: React.FC = () => {
             style={{
               display: 'flex',
               flexDirection: 'row',
-              height: '50px',
+              height: '100px',
               borderBottom: '1px solid #ccc',
+              padding: '0px 100px',
+              fontSize: '18px',
+              fontWeight: 'bold',
+              backgroundColor: '#0CCDDD',
             }}
           >
             <nav
@@ -44,6 +50,20 @@ const App: React.FC = () => {
                 borderRight: '1px solid #ccc',
               }}
             >
+              <div>
+                <Link
+                  to="/"
+                  style={{
+                    textDecoration: 'none',
+                    color: '#333',
+                    fontSize: '50px',
+                    fontWeight: 'bold',
+                    marginRight: '30px',
+                  }}
+                >
+                  tixkraft
+                </Link>
+              </div>
               <Link
                 style={{
                   textDecoration: 'none',
@@ -54,8 +74,22 @@ const App: React.FC = () => {
                 onMouseOver={(e) => (e.currentTarget.style.color = '#1E90FF')}
                 onMouseOut={(e) => (e.currentTarget.style.color = '#333')}
               >
-                首頁
+                <p>活動資訊</p>
               </Link>
+              {isLoggedIn && (
+                <Link
+                  style={{
+                    textDecoration: 'none',
+                    color: '#333',
+                    padding: '30px',
+                  }}
+                  to="/myTicket"
+                  onMouseOver={(e) => (e.currentTarget.style.color = '#1E90FF')}
+                  onMouseOut={(e) => (e.currentTarget.style.color = '#333')}
+                >
+                  <p>我的訂單</p>
+                </Link>
+              )}
               <HostLink />
             </nav>
             <div
@@ -69,14 +103,17 @@ const App: React.FC = () => {
               <LoginDisplay /> {/* 顯示用戶名稱或登入按鈕 */}
             </div>
           </div>
-          <div style={{ flex: 1, padding: '10px' }}>
+          <div style={{ flex: 1, padding: '0px 100px' }}>
             {/* 主要內容路由 */}
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
               <Route path="/Activity/:id" element={<Activity />}></Route>
-              <Route path="/editActivity/:id" element={<EditActivity />}></Route>
+              <Route
+                path="/editActivity/:id"
+                element={<EditActivity />}
+              ></Route>
               <Route path="/create-activity" element={<CreateActivity />} />
               <Route path="/manage-activity" element={<ManageActivities />} />
               <Route path="/myTicket" element={<MyTicket />} />
@@ -121,19 +158,24 @@ const LoginDisplay: React.FC = () => {
       {isLoggedIn ? (
         <>
           <div
-            style={{ position: 'relative', display: 'inline-block' }}
+            style={{
+              position: 'relative',
+              display: 'inline-block',
+            }}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
             <button
               style={{
                 backgroundColor: 'transparent',
-                border: '1px solid #ccc',
+                border: '0px solid #ccc',
                 cursor: 'pointer',
                 padding: '10px',
-                fontSize: '16px',
+                color: '#000',
                 width: '200px', // 設定固定寬度與下拉選單一致
                 textAlign: 'center',
+                fontSize: '18px',
+                fontWeight: 'bold',
               }}
             >
               會員帳戶
@@ -163,7 +205,18 @@ const LoginDisplay: React.FC = () => {
                   <li
                     style={{
                       borderBottom: '1px solid #eee',
-                      padding: '10px',
+                      padding: '10px 0',
+                      display: 'block', // 確保填滿父容器
+                      width: '100%',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <p>{name}</p>
+                  </li>
+                  <li
+                    style={{
+                      borderBottom: '1px solid #eee',
+                      padding: '10px 0',
                       display: 'block', // 確保填滿父容器
                       width: '100%',
                     }}
@@ -188,7 +241,7 @@ const LoginDisplay: React.FC = () => {
                   <li
                     style={{
                       borderBottom: '1px solid #eee',
-                      padding: '10px',
+                      padding: '10px 0',
                       display: 'block', // 確保填滿父容器
                       width: '100%',
                     }}
@@ -213,7 +266,7 @@ const LoginDisplay: React.FC = () => {
                   <li
                     style={{
                       borderBottom: '1px solid #eee',
-                      padding: '10px',
+                      padding: '10px 0',
                       display: 'block', // 確保填滿父容器
                       width: '100%',
                     }}

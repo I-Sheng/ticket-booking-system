@@ -54,7 +54,9 @@ const Home: React.FC = () => {
 
   return (
     <div>
-      <h1>節目資訊</h1>
+      <p style={{ letterSpacing: '1.3px', color: '#666', fontSize: '14px' }}>
+        首頁 / 節目資訊
+      </p>
       <div
         style={{
           display: 'flex',
