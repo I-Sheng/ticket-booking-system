@@ -35,7 +35,13 @@ const Login: React.FC = () => {
       const data = await response.json()
       if (data.jwtToken) {
         // 登录成功后，调用 login 保存状态和 token
-        login(data.email, data.username, data.jwtToken, data.role, data.phone_number)
+        login(
+          data.email,
+          data.username,
+          data.jwtToken,
+          data.role,
+          data.phone_number
+        )
         navigate('/') // 跳转到首页
       } else {
         alert('登录失败')
@@ -50,7 +56,7 @@ const Login: React.FC = () => {
   }
 
   return (
-    <div>
+    <div className="create-activity-container">
       <h2>登入</h2>
       <form onSubmit={handleSubmit}>
         <div>
@@ -61,6 +67,7 @@ const Login: React.FC = () => {
             value={email}
             onChange={(e) => setemail(e.target.value)}
             required
+            className="input-region"
           />
         </div>
         <div>
@@ -71,6 +78,7 @@ const Login: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            className="input-region"
           />
         </div>
         {error && <p style={{ color: 'red' }}>{error}</p>}

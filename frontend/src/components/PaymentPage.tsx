@@ -11,12 +11,18 @@ interface Ticket {
   seat_number: number
   is_paid: boolean
 }
+interface Region {
+  region_name: string
+  region_price: number
+  region_capacity: number
+}
 const PaymentPage: React.FC = () => {
   const { id } = useParams()
   const { jwtToken, name, phone } = useAuth()
   const [ticket, setTicket] = useState<Ticket>() // 儲存票據詳情
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [region, setRegion] = useState<Region>()
 
   const [cardNumber, setCardNumber] = useState(['1234', '5678', '9012', '3456']) // 四個輸入框
   const [cvv, setCvv] = useState('123')
@@ -25,6 +31,23 @@ const PaymentPage: React.FC = () => {
 
   const navigate = useNavigate()
 
+  const fetchRegions = async (ticket_id: string) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/activities/regions/${ticket_id}`,
+        {
+          method: 'GET',
+          redirect: 'follow',
+        }
+      )
+      if (response.ok) {
+        const data = await response.json() // 使用 API 獲取票據信息
+        setRegion(data.region)
+      }
+    } catch (error) {
+      throw new Error()
+    }
+  }
   const fetchTicketDetails = async (id: string) => {
     try {
       setLoading(true)
@@ -36,6 +59,7 @@ const PaymentPage: React.FC = () => {
       if (response.ok) {
         const data = await response.json() // 使用 API 獲取票據信息
         setTicket(data.ticket)
+        fetchRegions(data.ticket.region_id)
         setLoading(false)
       }
     } catch (error: any) {
@@ -92,7 +116,7 @@ const PaymentPage: React.FC = () => {
       if (response.ok) {
         alert('付款成功')
         navigate(`/myTicket`)
-      }else{
+      } else {
         alert('付款失敗')
       }
     } catch (error) {
@@ -121,9 +145,10 @@ const PaymentPage: React.FC = () => {
           <strong>訂單編號: </strong>
           {ticket._id}
         </p>
-        <p>
-          <strong>訂單金額: </strong>
-        </p>
+        {/* <p> */}
+        {/*   <strong>訂單金額: </strong> */}
+        {/*   {region?.region_price} */}
+        {/* </p> */}
         <p>
           <strong>座位: </strong>
           {ticket.seat_number}
