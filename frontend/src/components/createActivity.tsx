@@ -160,11 +160,12 @@ const CreateActivity = () => {
   if (role != 'host') {
     return <h2>Permissions denied</h2>
   }
+
   return (
-    <div>
-      <h2>新增活動</h2>
+    <div className="create-activity-container">
+      <p className="page-title">管理 / 新增活動</p>
       <form onSubmit={handleSubmit} encType="multipart/form-data">
-        <div>
+        <div className="input-group">
           <label htmlFor="title">活動名稱：</label>
           <input
             type="text"
@@ -172,20 +173,22 @@ const CreateActivity = () => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
+            className="input"
           />
         </div>
-        <div>
+
+        <div className="input-group">
           <label htmlFor="content">說明：</label>
           <textarea
             id="content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             required
+            className="textarea"
           ></textarea>
         </div>
 
-        {/* 變更為選擇日期和時間 */}
-        <div>
+        <div className="input-group">
           <label htmlFor="activity_date">活動日期：</label>
           <input
             type="date"
@@ -193,9 +196,11 @@ const CreateActivity = () => {
             value={activityDate}
             onChange={(e) => setActivityDate(e.target.value)}
             required
+            className="input"
           />
         </div>
-        <div>
+
+        <div className="input-group">
           <label htmlFor="start_time">開始時間：</label>
           <input
             type="time"
@@ -203,9 +208,11 @@ const CreateActivity = () => {
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
             required
+            className="input"
           />
         </div>
-        <div>
+
+        <div className="input-group">
           <label htmlFor="end_time">結束時間：</label>
           <input
             type="time"
@@ -213,10 +220,11 @@ const CreateActivity = () => {
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
             required
+            className="input"
           />
         </div>
 
-        <div>
+        <div className="input-group">
           <label htmlFor="on_sale_date">開賣日：</label>
           <input
             type="datetime-local"
@@ -224,15 +232,18 @@ const CreateActivity = () => {
             value={onSaleDate}
             onChange={(e) => setOnSaleDate(e.target.value)}
             required
+            className="input"
           />
         </div>
-        <div>
+
+        <div className="input-group">
           <label htmlFor="arena_id">場館：</label>
           <select
             id="arena_id"
             value={arenaId}
             onChange={(e) => setArenaId(e.target.value)} // 當選擇時設置 arenaId 為 _id
             required
+            className="select"
           >
             <option value="">選擇場館</option>
             {arenas.map((arena) => (
@@ -243,10 +254,9 @@ const CreateActivity = () => {
           </select>
         </div>
 
-        <h3>區域</h3>
-        <p style={{ fontStyle: 'italic', color: '#666', marginBottom: '10px' }}>
-          區域名稱、價格、座位上限
-        </p>
+        <h3 className="section-title">區域</h3>
+        <p className="sub-description">區域名稱、價格、座位上限</p>
+
         {regions.map((region, index) => (
           <div key={index} className="region-fields">
             <input
@@ -256,6 +266,7 @@ const CreateActivity = () => {
               onChange={(e) =>
                 handleRegionChange(index, 'region_name', e.target.value)
               }
+              className="input-region"
               required
             />
             <input
@@ -269,6 +280,7 @@ const CreateActivity = () => {
                   parseFloat(e.target.value)
                 )
               }
+              className="input-region"
               required
             />
             <input
@@ -282,35 +294,23 @@ const CreateActivity = () => {
                   parseInt(e.target.value)
                 )
               }
+              className="input-region"
               required
             />
             <button
               type="button"
               onClick={() => handleRemoveRegion(index)}
-              style={{
-                backgroundColor: 'transparent',
-                marginLeft: '10px',
-                border: 'none',
-                cursor: 'pointer',
-                borderRadius: '4px',
-              }}
-              onMouseOver={(e) => (e.currentTarget.style.color = '#E60012')}
-              onMouseOut={(e) => (e.currentTarget.style.color = '#333')}
+              className="remove-button"
             >
               X
             </button>
           </div>
         ))}
-        <button type="button" onClick={handleAddRegion}>
+        <button type="button" onClick={handleAddRegion} className="add-button">
           新增區域
         </button>
 
-        <div
-          style={{
-            padding: '10px 15px',
-          }}
-        />
-        <div>
+        <div className="input-group">
           <label htmlFor="cover_img">封面圖</label>
           <input
             type="file"
@@ -319,9 +319,10 @@ const CreateActivity = () => {
             onChange={(e) =>
               setCoverImg(e.target.files ? e.target.files[0] : null)
             }
+            className="input-file"
           />
         </div>
-        <div>
+        <div className="input-group">
           <label htmlFor="price_level_img">價位圖</label>
           <input
             type="file"
@@ -330,13 +331,16 @@ const CreateActivity = () => {
             onChange={(e) =>
               setPriceLevelImg(e.target.files ? e.target.files[0] : null)
             }
+            className="input-file"
           />
         </div>
 
-        <button type="submit">確認新增</button>
+        <button type="submit" className="submit-button">
+          確認新增
+        </button>
       </form>
 
-      {status && <p>{status}</p>}
+      {status && <p className="status-message">{status}</p>}
     </div>
   )
 }
