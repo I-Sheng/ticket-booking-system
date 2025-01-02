@@ -62,7 +62,7 @@ async function reserveTicketFromId(
       });
 
       res.status(200).json({ message: "Ticket reserved successfully" });
-      return true;
+      return res;
     } finally {
       // Release the lock
       await lock.release();
@@ -73,7 +73,7 @@ async function reserveTicketFromId(
     } else {
       res.status(500).json({ error: error.message });
     }
-    return false;
+    return res;
   }
 }
 
@@ -82,16 +82,17 @@ router.post("/reserveTicket", jwtProtect, async (req, res) => {
   const user_id: string = req.body.decoded._id;
 
   try {
-    const ticketIdList: string[] = await readRedisRegion(region_id);
+    let ticketIdList: string[] = await readRedisRegion(region_id);
     if (ticketIdList.length === 0) {
       // Step 2: If no tickets found in Redis, fetch from database
       console.log("No tickets found in Redis, querying database...");
-      const tickets = await listTicketsByRegion(region_id, false);
+      ticketIdList = await listTicketsByRegion(region_id, false);
     }
 
     for (const ticket_id of ticketIdList) {
       const success = await reserveTicketFromId(ticket_id, user_id, res);
       if (success) {
+        res = res;
         return; // Stop after successfully reserving a ticket
       }
     }
