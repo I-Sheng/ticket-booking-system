@@ -110,9 +110,11 @@ export const readRedisRegion = async (region_id: string): Promise<string[]> => {
   const regionStatusKey = getRegionStatusKey(region_id, "empty");
   return await redis.smembers(regionStatusKey);
 };
-// Migrate tickets from Redis to PostgreSQL
-// export const migrateTicketsToPostgres = async (): Promise<void> => {
-//   console.log("enter migrate");
+
+// //Migrate tickets from Redis to PostgreSQL
+// export const migrateTicketsToPostgres = async (
+//   user_id: string
+// ): Promise<void> => {
 //   const keys = await redis.keys(`${TICKET_KEY_PREFIX}*`);
 //   for (const key of keys) {
 //     const ticket = await redis.hgetall(key);
@@ -120,16 +122,17 @@ export const readRedisRegion = async (region_id: string): Promise<string[]> => {
 //     const dataToUpdate: {
 //       ticket_id: string;
 //       is_paid?: boolean;
-//       seat_number?: number;
+//       user_id?: string;
 //     } = {
 //       ticket_id: ticket.ticket_id,
-//       seat_number: Number(ticket.seat_number),
+//       user_id: user_id,
 //     };
 //     if (ticket.status === "paid") {
 //       dataToUpdate.is_paid = true;
 //     }
-//     console.log(dataToUpdate);
+
 //     const result = await updateTicket(dataToUpdate);
+
 //     if (result.error) {
 //       console.error(
 //         `Failed to update ticket ${ticket.ticket_id}:`,
@@ -139,7 +142,3 @@ export const readRedisRegion = async (region_id: string): Promise<string[]> => {
 //   }
 //   console.log("Migration completed successfully.");
 // };
-// Example usage (uncomment to test)
-// (async () => {
-//   await migrateTicketsToPostgres();
-// })();
