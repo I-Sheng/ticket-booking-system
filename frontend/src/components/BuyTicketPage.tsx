@@ -34,7 +34,7 @@ interface Activity {
 
 const BuyTicketPage: React.FC = () => {
   const { id } = useParams() // 獲取活動ID
-  const { jwtToken } = useAuth()
+  const { jwtToken, isLoggedIn } = useAuth()
   const [activity, setActivity] = useState<Activity | null>(null)
   const [arena, setArena] = useState<Arena | null>(null)
   const [selectedRegion, setSelectedRegion] = useState<string>('') // 選擇區域
@@ -153,6 +153,9 @@ const BuyTicketPage: React.FC = () => {
     // 在此執行實際的購票邏輯，如 API 提交等
   }
 
+  if (!isLoggedIn) {
+    navigate('/login')
+  }
   if (!activity || !arena) {
     return (
       <div>
