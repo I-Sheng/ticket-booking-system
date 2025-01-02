@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom'
 import { formatDate } from '../context/kits'
 
 interface WidgetProps {
-  id: string // 假设每个活动有唯一的 id
+  id: string
+  path: string
   imageUrl: { type: string; data: number[] }
   name: string
   on_sale_date: string
@@ -12,12 +13,12 @@ interface WidgetProps {
   end_date: string
 }
 
-function Widget({ imageUrl, name, start_date, end_date, id }: WidgetProps) {
+function Widget({ imageUrl, name, start_date, end_date,path, id }: WidgetProps) {
   const { isLoggedIn } = useAuth()
 
   return (
     <Link
-      to={`/activity/${id}`} // 使用模板字符串来传递动态的 ID
+      to={`/${path}/${id}`} // 使用模板字符串来传递动态的 ID
       style={{
         display: 'block',
         width: '300px',
