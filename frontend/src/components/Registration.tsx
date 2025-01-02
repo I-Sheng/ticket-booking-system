@@ -79,7 +79,7 @@ const Registration: React.FC = () => {
   }
 
   return (
-    <div>
+    <div className="create-activity-container">
       <h2>註冊</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {success && <p style={{ color: 'green' }}>{success}</p>}
@@ -94,6 +94,7 @@ const Registration: React.FC = () => {
               value={accountData.email}
               onChange={handleAccountChange}
               required
+              className="input-region"
             />
           </div>
           <div>
@@ -104,6 +105,7 @@ const Registration: React.FC = () => {
               value={accountData.password}
               onChange={handleAccountChange}
               required
+              className="input-region"
             />
           </div>
           <div>
@@ -114,6 +116,7 @@ const Registration: React.FC = () => {
               value={accountData.confirmPassword}
               onChange={handleAccountChange}
               required
+              className="input-region"
             />
           </div>
           <button type="submit">下一步</button>
@@ -130,6 +133,7 @@ const Registration: React.FC = () => {
               value={personalData.name}
               onChange={handlePersonalChange}
               required
+              className="input-region"
             />
           </div>
           <div>
@@ -140,6 +144,7 @@ const Registration: React.FC = () => {
               value={personalData.phone}
               onChange={handlePersonalChange}
               required
+              className="input-region"
             />
           </div>
           <button type="button" onClick={() => setStep(1)}>
