@@ -82,7 +82,7 @@ router.post("/reserveTicket", jwtProtect, async (req, res) => {
   const user_id: string = req.body.decoded._id;
 
   try {
-    let ticketIdList: string[] = await readRedisRegion(region_id);
+    let ticketIdList: any = await readRedisRegion(region_id);
     if (ticketIdList.length === 0) {
       // Step 2: If no tickets found in Redis, fetch from database
       console.log("No tickets found in Redis, querying database...");

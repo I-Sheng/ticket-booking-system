@@ -27,13 +27,15 @@ export async function getTicketById(ticket_id: string, user_id: string) {
     }
     return result.rows[0]; // Return single ticket
   } catch (error) {
-    console.error('Error fetching ticket by ID:', error);
-    return { error: 'Failed to fetch ticket' };
+    console.error("Error fetching ticket by ID:", error);
+    return { error: "Failed to fetch ticket" };
   }
 }
 
-
-export async function listTicketsByActivity(activity_id: string, is_paid?: string) {
+export async function listTicketsByActivity(
+  activity_id: string,
+  is_paid?: string
+) {
   // Base query string
   let qstring = `SELECT * FROM tickets WHERE activity_id = $1`;
   const params: (string | boolean)[] = [activity_id];
@@ -61,7 +63,7 @@ export async function listTicketsByRegion(
   is_paid?: boolean
 ) {
   // Base query string
-  let qstring = `SELECT * FROM tickets WHERE region_id = $1`;
+  let qstring = `SELECT ticket_id FROM tickets WHERE region_id = $1`;
   const params: (string | boolean)[] = [region_id];
 
   // Add filter for is_paid if provided
@@ -72,7 +74,8 @@ export async function listTicketsByRegion(
 
   try {
     const result = await query(qstring, params);
-    return result.rows;
+    const ans: string[] = result.rows;
+    return ans;
   } catch (error) {
     console.error("Error listing tickets by activity and region:", error);
     return { error: "Failed to fetch tickets" };
