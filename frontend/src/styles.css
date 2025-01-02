@@ -49,13 +49,13 @@ h3.section-title {
   border: 1px solid #ddd;
   box-sizing: border-box;
 }
-.input-region
- {
+.input-region {
   width: 30%;
   padding: 10px;
   border-radius: 5px;
   border: 1px solid #ddd;
   box-sizing: border-box;
+  margin: 10px;
 }
 
 .input-file {
@@ -68,7 +68,7 @@ textarea.textarea {
 
 button {
   padding: 10px 20px;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   border: none;
   color: white;
   cursor: pointer;
@@ -83,7 +83,7 @@ button:hover {
 .remove-button {
   background-color: transparent;
   border: none;
-  color: #E60012;
+  color: #e60012;
   cursor: pointer;
   font-size: 16px;
 }
@@ -94,7 +94,7 @@ button:hover {
 
 .add-button {
   margin-top: 10px;
-  background-color: #007BFF;
+  background-color: #007bff;
   border: none;
   color: white;
   cursor: pointer;
@@ -111,4 +111,3 @@ button:hover {
   text-align: center;
   color: red;
 }
-

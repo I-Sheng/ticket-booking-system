@@ -23,6 +23,7 @@ import ManageActivities from './components/manageActivities'
 import EditActivity from './components/editActivity'
 
 const App: React.FC = () => {
+  const { isLoggedIn } = useAuth()
   return (
     <AuthProvider>
       <Router>
@@ -75,18 +76,20 @@ const App: React.FC = () => {
               >
                 <p>活動資訊</p>
               </Link>
-              <Link
-                style={{
-                  textDecoration: 'none',
-                  color: '#333',
-                  padding: '30px',
-                }}
-                to="/myTicket"
-                onMouseOver={(e) => (e.currentTarget.style.color = '#1E90FF')}
-                onMouseOut={(e) => (e.currentTarget.style.color = '#333')}
-              >
-                <p>我的訂單</p>
-              </Link>
+              {isLoggedIn && (
+                <Link
+                  style={{
+                    textDecoration: 'none',
+                    color: '#333',
+                    padding: '30px',
+                  }}
+                  to="/myTicket"
+                  onMouseOver={(e) => (e.currentTarget.style.color = '#1E90FF')}
+                  onMouseOut={(e) => (e.currentTarget.style.color = '#333')}
+                >
+                  <p>我的訂單</p>
+                </Link>
+              )}
               <HostLink />
             </nav>
             <div
@@ -202,7 +205,7 @@ const LoginDisplay: React.FC = () => {
                   <li
                     style={{
                       borderBottom: '1px solid #eee',
-                      padding: '10px',
+                      padding: '10px 0',
                       display: 'block', // 確保填滿父容器
                       width: '100%',
                       textAlign: 'center',
@@ -213,7 +216,7 @@ const LoginDisplay: React.FC = () => {
                   <li
                     style={{
                       borderBottom: '1px solid #eee',
-                      padding: '10px',
+                      padding: '10px 0',
                       display: 'block', // 確保填滿父容器
                       width: '100%',
                     }}
@@ -238,7 +241,7 @@ const LoginDisplay: React.FC = () => {
                   <li
                     style={{
                       borderBottom: '1px solid #eee',
-                      padding: '10px',
+                      padding: '10px 0',
                       display: 'block', // 確保填滿父容器
                       width: '100%',
                     }}
@@ -263,7 +266,7 @@ const LoginDisplay: React.FC = () => {
                   <li
                     style={{
                       borderBottom: '1px solid #eee',
-                      padding: '10px',
+                      padding: '10px 0',
                       display: 'block', // 確保填滿父容器
                       width: '100%',
                     }}
