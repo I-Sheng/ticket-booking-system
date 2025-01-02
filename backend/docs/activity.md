@@ -200,6 +200,43 @@ Regions Example (JSON):
 
 ---
 
+<details>
+<summary><code>GET</code> <code><b>/regions/:region_id</b></code> 
+
+<code>(Get an region info by region_id)</code></summary>
+
+##### Path Parameters
+
+> | key          | required | data type | description                     |
+> | ------------ | -------- | --------- | ------------------------------- |
+> | region_id  | true     | string    | UUID of the region to retrieve |
+
+##### Responses
+
+> | http code | content-type       | response                                                   |
+> | --------- | ------------------ | --------------------------------------------------------- |
+> | `200`     | `application/json` | `{"message": "Region retrieved successfully", "region": region}` |
+> | `404`     | `application/json` | `{"error": "Region not found"}`                         |
+> | `500`     | `application/json` | `{"error": "Internal server error"}`                      |
+
+
+```json
+//response example
+{
+    "message": "Region retrieved successfully",
+    "region": {
+        "_id": "4e5ad3d3-b8ab-4dd1-9154-d7d07d3295ab",
+        "activity_id": "4ccd62ad-4549-4317-8dc8-a08b85e7e492",
+        "region_name": "VIP Section",
+        "region_price": 3000,
+        "region_capacity": 10
+    }
+}
+```
+</details>
+
+---
+
 <details> <summary><code>GET</code> <code><b>/creator/:creator_id</b></code> 
 
 <code>(Get all activities created by a specific creator, including archived activities)</code></summary>
