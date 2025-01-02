@@ -46,7 +46,37 @@ const CreateActivity = () => {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
+    setStatus('')
     e.preventDefault()
+    const regionNames = regions.map((region) => region.region_name)
+    const hasDuplicateRegionNames =
+      new Set(regionNames).size !== regionNames.length
+
+    if (hasDuplicateRegionNames) {
+      alert('區域名稱不能重複，請修改後再送出')
+      return
+    }
+    const hasInvalidRegion = regions.some(
+      (region) => region.region_price === 0 || region.region_capacity === 0
+    )
+
+    if (hasInvalidRegion) {
+      alert('價格或座位不能為0，請修改後再送出')
+      return // 防止送出
+    }
+    if (
+      !title ||
+      !content ||
+      !activityDate ||
+      !startTime ||
+      !endTime ||
+      !onSaleDate ||
+      !arenaId ||
+      regions.length == 0
+    ) {
+      alert('資料不得為空')
+      return
+    }
     const formData = new FormData()
 
     // Append text fields to formData
@@ -120,6 +150,11 @@ const CreateActivity = () => {
       ...regions,
       { region_name: '', region_price: 0, region_capacity: 0 },
     ])
+  }
+
+  const handleRemoveRegion = (index: number) => {
+    const updatedRegions = regions.filter((_, i) => i !== index)
+    setRegions(updatedRegions)
   }
 
   if (role != 'host') {
@@ -249,6 +284,21 @@ const CreateActivity = () => {
               }
               required
             />
+            <button
+              type="button"
+              onClick={() => handleRemoveRegion(index)}
+              style={{
+                backgroundColor: 'transparent',
+                marginLeft: '10px',
+                border: 'none',
+                cursor: 'pointer',
+                borderRadius: '4px',
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.color = '#E60012')}
+              onMouseOut={(e) => (e.currentTarget.style.color = '#333')}
+            >
+              X
+            </button>
           </div>
         ))}
         <button type="button" onClick={handleAddRegion}>

@@ -5,13 +5,6 @@ import { listArena } from '../context/kits'
 import { useNavigate } from 'react-router-dom'
 const API_URL = process.env.REACT_APP_API_URL
 
-interface Arena {
-  _id: string
-  title: string
-  address: string
-  capacity: number
-}
-
 interface Region {
   region_name: string
   region_price: number
