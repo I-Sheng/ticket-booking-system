@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { listArena } from '../context/kits'
 import { useNavigate, useParams } from 'react-router-dom'
+import { convertToObject } from 'typescript'
 const API_URL = process.env.REACT_APP_API_URL
 
 interface Arena {
@@ -31,6 +32,7 @@ const EditActivity = () => {
   const [originRegions, setOriginRegions] = useState<Region[]>([])
   const [coverImg, setCoverImg] = useState<File | null>(null)
   const [priceLevelImg, setPriceLevelImg] = useState<File | null>(null)
+
   const [status, setStatus] = useState('')
   const [arenas, setArenas] = useState<Arena[]>([])
   const navigate = useNavigate()
@@ -82,8 +84,9 @@ const EditActivity = () => {
           )
         }
         setOriginRegions(activityData.regions)
-        setCoverImg(activityData.coverImg)
-        setPriceLevelImg(activityData.priceLevelImg)
+        setCoverImg(activityData.cover_img as File)
+        setPriceLevelImg(activityData.price_level_img as File)
+        // console.log(activityData)
         const formatToInputDateTime = (isoDateTime: string | undefined) => {
           if (!isoDateTime) return '' // 若未定義值，返回空字串
           const date = new Date(isoDateTime) // 確保是日期對象
@@ -127,7 +130,6 @@ const EditActivity = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setStatus('')
-    e.preventDefault()
     const regionNames = regions.map((region) => region.region_name)
     const hasDuplicateRegionNames =
       new Set(regionNames).size !== regionNames.length
@@ -227,8 +229,8 @@ const EditActivity = () => {
   }
 
   return (
-    <div>
-      <h2>管理活動</h2>
+    <div className="create-activity-container">
+      <p className="page-title">管理 / 管理活動</p>
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <div>
           <label htmlFor="title">活動名稱：</label>
@@ -239,6 +241,7 @@ const EditActivity = () => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
+            className="input"
           />
         </div>
         <div>
@@ -248,6 +251,7 @@ const EditActivity = () => {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             required
+            className="textarea"
           ></textarea>
         </div>
 
@@ -261,6 +265,7 @@ const EditActivity = () => {
             value={activityDate}
             onChange={(e) => setActivityDate(e.target.value)}
             required
+            className="input"
           />
         </div>
         <div>
@@ -272,6 +277,7 @@ const EditActivity = () => {
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
             required
+            className="input"
           />
         </div>
         <div>
@@ -283,6 +289,7 @@ const EditActivity = () => {
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
             required
+            className="input"
           />
         </div>
 
@@ -295,6 +302,7 @@ const EditActivity = () => {
             value={onSaleDate}
             onChange={(e) => setOnSaleDate(e.target.value)}
             required
+            className="input"
           />
         </div>
         <div>
@@ -305,6 +313,7 @@ const EditActivity = () => {
             value={arenaId}
             onChange={(e) => setArenaId(e.target.value)} // 當選擇時設置 arenaId 為 _id
             required
+            className="select"
           >
             <option value="">選擇場館</option>
             {arenas.map((arena) => (
@@ -316,9 +325,7 @@ const EditActivity = () => {
         </div>
 
         <h3>區域</h3>
-        <p style={{ fontStyle: 'italic', color: '#666', marginBottom: '10px' }}>
-          區域名稱、價格、座位上限
-        </p>
+        <p className="sub-description">區域名稱、價格、座位上限</p>
         {regions.map((region, index) => {
           const isNewRegion = !originRegions.some(
             (origRegion) =>
@@ -337,6 +344,7 @@ const EditActivity = () => {
                   handleRegionChange(index, 'region_name', e.target.value)
                 }
                 required
+                className="input-region"
               />
               <input
                 type="number"
@@ -351,6 +359,7 @@ const EditActivity = () => {
                   )
                 }
                 required
+                className="input-region"
               />
               <input
                 type="number"
@@ -364,21 +373,14 @@ const EditActivity = () => {
                     parseInt(e.target.value)
                   )
                 }
+                className="input-region"
                 required
               />
-              {!isOnSale && (
+              {(isNewRegion || !isOnSale) && (
                 <button
                   type="button"
                   onClick={() => handleRemoveRegion(index)}
-                  style={{
-                    backgroundColor: 'transparent',
-                    marginLeft: '10px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    borderRadius: '4px',
-                  }}
-                  onMouseOver={(e) => (e.currentTarget.style.color = '#E60012')}
-                  onMouseOut={(e) => (e.currentTarget.style.color = '#333')}
+                  className="remove-button"
                 >
                   X
                 </button>
@@ -386,7 +388,7 @@ const EditActivity = () => {
             </div>
           )
         })}
-        <button type="button" onClick={handleAddRegion}>
+        <button type="button" onClick={handleAddRegion} className="add-button">
           新增區域
         </button>
 
@@ -404,6 +406,7 @@ const EditActivity = () => {
             onChange={(e) =>
               setCoverImg(e.target.files ? e.target.files[0] : null)
             }
+            className="input-file"
           />
         </div>
         <div>
@@ -415,10 +418,13 @@ const EditActivity = () => {
             onChange={(e) =>
               setPriceLevelImg(e.target.files ? e.target.files[0] : null)
             }
+            className="input-file"
           />
         </div>
 
-        <button type="submit">確認修改</button>
+        <button type="submit" className="submit-button">
+          確認修改
+        </button>
       </form>
 
       {status && <p>{status}</p>}
