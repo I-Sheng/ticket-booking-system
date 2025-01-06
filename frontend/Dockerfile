@@ -14,7 +14,8 @@ RUN npm install
 COPY . .
 
 # ENV
-ENV REACT_APP_API_URL='http://35.78.245.230:8080'
+#ENV REACT_APP_API_URL='http://35.78.245.230:8080'
+ENV REACT_APP_API_URL='https://tickets.cloudnative-nccu.live/api'
 
 # Build the Next.js application
 RUN npm run build
