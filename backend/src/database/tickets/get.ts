@@ -63,7 +63,7 @@ export async function listTicketsByRegion(
   is_paid?: boolean
 ) {
   // Base query string
-  let qstring = `SELECT ticket_id FROM tickets WHERE region_id = $1`;
+  let qstring = `SELECT _id FROM tickets WHERE region_id = $1`;
   const params: (string | boolean)[] = [region_id];
 
   // Add filter for is_paid if provided
